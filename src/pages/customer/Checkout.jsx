@@ -97,7 +97,7 @@ export default function Checkout() {
     */
 
     // New WhatsApp Flow
-    const brandPhoneNumber = '919999999999' // Dummy Indian Number
+    const brandPhoneNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '919999999999'
     
     let message = `*New Order - Shri Guru Ji Dry Fruits* 🥜\n\n`
     message += `*Customer Details:*\n`

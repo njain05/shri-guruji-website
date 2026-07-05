@@ -2,7 +2,7 @@
 // Generates UPI payment links and QR code URLs
 
 // Set your UPI ID here
-export const MERCHANT_UPI_ID = 'yourupi@paytm'
+export const MERCHANT_UPI_ID = import.meta.env.VITE_UPI_ID || 'yourupi@paytm'
 export const MERCHANT_NAME = 'Shri Guru Ji Dry Fruits'
 
 /**
