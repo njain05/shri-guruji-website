@@ -1,0 +1,30 @@
+# dependencies
+node_modules/
+
+# production builds
+dist/
+dist-ssr/
+
+# local env files (secrets)
+.env
+.env.*
+!.env.example
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# misc
+*.tsbuildinfo
+
+# local raw image source
+pics/

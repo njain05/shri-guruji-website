@@ -1,0 +1,5 @@
+# This project currently has no Python runtime dependencies.
+# Stack: React + Vite (Node.js).
+#
+# If Python is added later, list pinned packages here, for example:
+# flask==3.0.3
