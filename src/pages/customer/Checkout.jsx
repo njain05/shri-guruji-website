@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
 import { FiCreditCard, FiTruck, FiSmartphone, FiGift, FiShield, FiCheckCircle, FiRefreshCw, FiMessageCircle } from 'react-icons/fi'
 import { useCart } from '../../context/CartContext'
+import { useOrders } from '../../context/OrderContext'
 import { formatPrice, generateUPILink, MERCHANT_UPI_ID, generateOrderId } from '../../utils/payment'
 import toast from 'react-hot-toast'
 import './Checkout.css'
@@ -23,6 +24,7 @@ const INDIAN_STATES = [
 export default function Checkout() {
   const navigate = useNavigate()
   const { cart, getCartTotal, clearCart } = useCart()
+  const { placeOrder } = useOrders()
 
   const [paymentMethod, setPaymentMethod] = useState('upi')
   const [showUPIQR, setShowUPIQR] = useState(false)
@@ -135,6 +137,7 @@ export default function Checkout() {
       giftPackaging
     }
 
+    await placeOrder(order)
     window.open(whatsappUrl, '_blank')
     clearCart()
     toast.success('Order sent via WhatsApp!')
