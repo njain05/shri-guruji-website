@@ -116,7 +116,47 @@
 .navbar__actions {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-sm);
+}
+
+.navbar__icon-btn {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: var(--color-beige);
+  color: var(--color-brown);
+  transition: all var(--transition-normal);
+}
+
+.navbar__icon-btn:hover {
+  background: var(--color-brown);
+  color: var(--color-cream);
+  transform: scale(1.05);
+}
+
+.navbar--admin .navbar__icon-btn {
+  background: rgba(255,255,255,0.1);
+  color: var(--color-cream);
+}
+
+.navbar__icon-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 18px;
+  height: 18px;
+  background: var(--color-danger);
+  color: var(--color-white);
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
 }
 
 .navbar__cart-btn {

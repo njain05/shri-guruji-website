@@ -2,6 +2,7 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import WhatsAppButton from './components/WhatsAppButton'
 
 // Customer pages
 import Home from './pages/customer/Home'
@@ -10,6 +11,7 @@ import ProductDetail from './pages/customer/ProductDetail'
 import Cart from './pages/customer/Cart'
 import Checkout from './pages/customer/Checkout'
 import OrderConfirmation from './pages/customer/OrderConfirmation'
+import Wishlist from './pages/customer/Wishlist'
 
 // Admin pages
 import AdminLogin from './pages/admin/AdminLogin'
@@ -28,12 +30,12 @@ function ScrollToTop() {
 export default function App() {
   const location = useLocation()
   const isAdminPage = location.pathname.startsWith('/admin')
-  const isLoginPage = location.pathname === '/admin'
+  const isAdminLogin = location.pathname === '/admin'
 
   return (
     <>
       <ScrollToTop />
-      {!isLoginPage && <Navbar />}
+      {!isAdminLogin && <Navbar />}
 
       <main>
         <Routes>
@@ -44,16 +46,18 @@ export default function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
+          <Route path="/wishlist" element={<Wishlist />} />
 
           {/* Admin Routes */}
-          {/* <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<Dashboard />} />
           <Route path="/admin/products" element={<ProductManager />} />
-          <Route path="/admin/orders" element={<OrderManager />} /> */}
+          <Route path="/admin/orders" element={<OrderManager />} />
         </Routes>
       </main>
 
       {!isAdminPage && <Footer />}
+      {!isAdminPage && <WhatsAppButton />}
     </>
   )
 }

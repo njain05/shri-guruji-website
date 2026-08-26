@@ -64,6 +64,15 @@
   display: flex;
   gap: var(--space-sm);
   flex-wrap: wrap;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.products-page__categories::-webkit-scrollbar {
+  display: none;
 }
 
 .products-page__cat-btn {

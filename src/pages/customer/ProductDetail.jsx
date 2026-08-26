@@ -1,20 +1,42 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { FiShoppingCart, FiMinus, FiPlus, FiArrowLeft, FiPackage } from 'react-icons/fi'
+import { FiShoppingCart, FiMinus, FiPlus, FiArrowLeft, FiPackage, FiHeart } from 'react-icons/fi'
 import { useProducts } from '../../context/ProductContext'
 import { useCart } from '../../context/CartContext'
+import { useWishlist } from '../../context/WishlistContext'
 import { formatPrice } from '../../utils/payment'
 import toast from 'react-hot-toast'
 import './ProductDetail.css'
+
+function getRecentlyViewed(currentId) {
+  try {
+    const ids = JSON.parse(localStorage.getItem('guruji_recent') || '[]')
+    return ids.filter(id => id !== currentId).slice(0, 4)
+  } catch {
+    return []
+  }
+}
+
+function addToRecentlyViewed(id) {
+  try {
+    const ids = JSON.parse(localStorage.getItem('guruji_recent') || '[]')
+    const updated = [id, ...ids.filter(i => i !== id)].slice(0, 10)
+    localStorage.setItem('guruji_recent', JSON.stringify(updated))
+  } catch {}
+}
 
 export default function ProductDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { getProduct, products } = useProducts()
   const { addToCart } = useCart()
+  const { toggleWishlist, isInWishlist } = useWishlist()
   const [quantity, setQuantity] = useState(1)
   const [weightIndex, setWeightIndex] = useState(0)
   const [imageIndex, setImageIndex] = useState(0)
+
+  const product = getProduct(id)
+  const inWishlist = product ? isInWishlist(product.id) : false
 
   useEffect(() => {
     setQuantity(1)
@@ -22,7 +44,9 @@ export default function ProductDetail() {
     setImageIndex(0)
   }, [id])
 
-  const product = getProduct(id)
+  useEffect(() => {
+    if (product) addToRecentlyViewed(id)
+  }, [id, product])
 
   if (!product) {
     return (
@@ -41,14 +65,25 @@ export default function ProductDetail() {
     .filter(p => p.category === product.category && p.id !== product.id)
     .slice(0, 4)
 
+  const recentIds = getRecentlyViewed(id)
+  const recentProducts = recentIds
+    .map(rid => products.find(p => p.id === rid))
+    .filter(Boolean)
+    .slice(0, 4)
+
   function handleAddToCart() {
     addToCart(product, quantity, product.weights[weightIndex])
-    toast.success(`${quantity}x ${product.name} (${product.weights[weightIndex].size}) added to cart!`)
+    toast.success(`${quantity}× ${product.name} (${product.weights[weightIndex].size}) added to cart!`)
   }
 
   function handleBuyNow() {
     addToCart(product, quantity, product.weights[weightIndex])
     navigate('/checkout')
+  }
+
+  function handleWishlist() {
+    toggleWishlist(product.id)
+    toast.success(inWishlist ? 'Removed from wishlist' : 'Saved to wishlist!')
   }
 
   return (
@@ -73,34 +108,36 @@ export default function ProductDetail() {
                 <span className="badge badge-gold product-detail__badge">Premium</span>
               )}
             </div>
-            
-            {/* Thumbnail Gallery */}
-            <div className="product-detail__gallery" style={{ display: 'flex', gap: '10px' }}>
-              {product.images.map((img, idx) => (
-                <div 
-                  key={idx} 
-                  onClick={() => setImageIndex(idx)}
-                  style={{ 
-                    cursor: 'pointer', 
-                    border: imageIndex === idx ? '2px solid #C49A45' : '2px solid transparent',
-                    borderRadius: '8px',
-                    overflow: 'hidden',
-                    width: '60px',
-                    height: '60px'
-                  }}
-                >
-                  <img src={img} alt="thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                </div>
-              ))}
-            </div>
+
+            {product.images.length > 1 && (
+              <div className="product-detail__gallery" style={{ display: 'flex', gap: '10px' }}>
+                {product.images.map((img, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => setImageIndex(idx)}
+                    style={{
+                      cursor: 'pointer',
+                      border: imageIndex === idx ? '2px solid #C49A45' : '2px solid transparent',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      width: '60px',
+                      height: '60px',
+                      flexShrink: 0
+                    }}
+                  >
+                    <img src={img} alt={`${product.name} view ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="product-detail__info">
             <span className="product-detail__category">{product.category}</span>
             <h1 className="product-detail__name">{product.name}</h1>
-            
+
             {/* Weight Selection */}
-            <div className="product-detail__weights" style={{ margin: '15px 0', display: 'flex', gap: '10px' }}>
+            <div className="product-detail__weights" style={{ margin: '15px 0', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               {product.weights.map((w, idx) => (
                 <button
                   key={idx}
@@ -151,6 +188,7 @@ export default function ProductDetail() {
                   onClick={() => setQuantity(q => Math.max(1, q - 1))}
                   className="product-detail__qty-btn"
                   disabled={quantity <= 1}
+                  aria-label="Decrease quantity"
                 >
                   <FiMinus size={16} />
                 </button>
@@ -158,6 +196,7 @@ export default function ProductDetail() {
                 <button
                   onClick={() => setQuantity(q => q + 1)}
                   className="product-detail__qty-btn"
+                  aria-label="Increase quantity"
                 >
                   <FiPlus size={16} />
                 </button>
@@ -168,6 +207,14 @@ export default function ProductDetail() {
               </button>
               <button className="btn btn-gold btn-lg" onClick={handleBuyNow}>
                 Buy Now
+              </button>
+              <button
+                className={`product-detail__wish-btn ${inWishlist ? 'product-detail__wish-btn--active' : ''}`}
+                onClick={handleWishlist}
+                title={inWishlist ? 'Remove from wishlist' : 'Save to wishlist'}
+                aria-label={inWishlist ? 'Remove from wishlist' : 'Save to wishlist'}
+              >
+                <FiHeart size={20} />
               </button>
             </div>
 
@@ -181,6 +228,7 @@ export default function ProductDetail() {
           </div>
         </div>
 
+        {/* Related Products */}
         {relatedProducts.length > 0 && (
           <div className="product-detail__related">
             <h3>You May Also Like</h3>
@@ -192,6 +240,7 @@ export default function ProductDetail() {
                     src={p.images[0]}
                     alt={p.name}
                     className="related-card__img"
+                    loading="lazy"
                     onError={(e) => {
                       e.target.src = `https://via.placeholder.com/300x300/F5F0E8/5C3D2E?text=${encodeURIComponent(p.name)}`
                     }}
@@ -205,6 +254,44 @@ export default function ProductDetail() {
             </div>
           </div>
         )}
+
+        {/* Recently Viewed */}
+        {recentProducts.length > 0 && (
+          <div className="product-detail__related">
+            <h3>Recently Viewed</h3>
+            <div className="section-divider" style={{ margin: '0.5rem 0 1.5rem' }}></div>
+            <div className="grid-4">
+              {recentProducts.map(p => (
+                <Link to={`/products/${p.id}`} key={p.id} className="related-card card">
+                  <img
+                    src={p.images[0]}
+                    alt={p.name}
+                    className="related-card__img"
+                    loading="lazy"
+                    onError={(e) => {
+                      e.target.src = `https://via.placeholder.com/300x300/F5F0E8/5C3D2E?text=${encodeURIComponent(p.name)}`
+                    }}
+                  />
+                  <div className="related-card__info">
+                    <h4>{p.name}</h4>
+                    <span>From {formatPrice(p.weights[0].price)}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Sticky Add-to-Cart bar (mobile only) */}
+      <div className="product-sticky-bar">
+        <div className="product-sticky-bar__info">
+          <span className="product-sticky-bar__name">{product.name}</span>
+          <span className="product-sticky-bar__price">{formatPrice(product.weights[weightIndex].price)}</span>
+        </div>
+        <button className="btn btn-primary" onClick={handleAddToCart}>
+          <FiShoppingCart size={16} /> Add to Cart
+        </button>
       </div>
     </div>
   )

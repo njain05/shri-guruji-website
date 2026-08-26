@@ -4,12 +4,16 @@ import { useCart } from '../../context/CartContext'
 import { formatPrice } from '../../utils/payment'
 import './Cart.css'
 
+const FREE_DELIVERY_THRESHOLD = 500
+
 export default function Cart() {
   const { cart, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart()
 
   const subtotal = getCartTotal()
-  const deliveryCharge = subtotal > 500 ? 0 : 50
+  const deliveryCharge = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : 50
   const total = subtotal + deliveryCharge
+  const remaining = FREE_DELIVERY_THRESHOLD - subtotal
+  const progressPercent = Math.min((subtotal / FREE_DELIVERY_THRESHOLD) * 100, 100)
 
   if (cart.length === 0) {
     return (
@@ -33,6 +37,27 @@ export default function Cart() {
       <div className="container">
         <h1 className="cart-page__title">Shopping Cart</h1>
         <p className="cart-page__count">{cart.length} item{cart.length !== 1 ? 's' : ''} in your cart</p>
+
+        {/* Free delivery progress bar */}
+        <div className="cart-delivery-bar">
+          {deliveryCharge > 0 ? (
+            <>
+              <p className="cart-delivery-bar__msg">
+                Add <strong>{formatPrice(remaining)}</strong> more for <strong>FREE delivery!</strong>
+              </p>
+              <div className="cart-delivery-bar__track">
+                <div
+                  className="cart-delivery-bar__fill"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            </>
+          ) : (
+            <p className="cart-delivery-bar__msg cart-delivery-bar__msg--free">
+              🎉 You've unlocked FREE delivery!
+            </p>
+          )}
+        </div>
 
         <div className="cart-layout">
           <div className="cart-items">
@@ -58,6 +83,7 @@ export default function Cart() {
                       className="cart-item__remove"
                       onClick={() => removeFromCart(item.cartId)}
                       title="Remove item"
+                      aria-label={`Remove ${item.name} from cart`}
                     >
                       <FiTrash2 size={16} />
                     </button>
@@ -68,6 +94,7 @@ export default function Cart() {
                       <button
                         onClick={() => updateQuantity(item.cartId, item.quantity - 1)}
                         className="cart-item__qty-btn"
+                        aria-label="Decrease quantity"
                       >
                         <FiMinus size={14} />
                       </button>
@@ -75,6 +102,7 @@ export default function Cart() {
                       <button
                         onClick={() => updateQuantity(item.cartId, item.quantity + 1)}
                         className="cart-item__qty-btn"
+                        aria-label="Increase quantity"
                       >
                         <FiPlus size={14} />
                       </button>
@@ -85,7 +113,11 @@ export default function Cart() {
               </div>
             ))}
 
-            <button className="btn btn-sm" onClick={clearCart} style={{ color: 'var(--color-danger)', background: 'none', padding: '0.5rem' }}>
+            <button
+              className="btn btn-sm"
+              onClick={clearCart}
+              style={{ color: 'var(--color-danger)', background: 'none', padding: '0.5rem' }}
+            >
               <FiTrash2 size={14} /> Clear Cart
             </button>
           </div>
@@ -99,7 +131,12 @@ export default function Cart() {
               </div>
               <div className="cart-summary__row">
                 <span>Delivery</span>
-                <span>{deliveryCharge === 0 ? <span className="text-green">FREE</span> : formatPrice(deliveryCharge)}</span>
+                <span>
+                  {deliveryCharge === 0
+                    ? <span className="text-green">FREE</span>
+                    : formatPrice(deliveryCharge)
+                  }
+                </span>
               </div>
               {deliveryCharge > 0 && (
                 <p className="cart-summary__note">Free delivery on orders above ₹500</p>

@@ -211,7 +211,7 @@ export const seedProducts = [
     "inStock": true,
     "featured": false,
     "images": [
-      "https://images.unsplash.com/photo-1563412885-a44a0e4e3292?w=500&h=500&fit=crop&q=80"
+      "/images/products/walnuts_1.jpg"
     ],
     "weights": [
       {
@@ -339,7 +339,7 @@ export const seedProducts = [
     "inStock": true,
     "featured": false,
     "images": [
-      "https://images.unsplash.com/photo-1529566652340-2c41a1eb6d93?w=500&h=500&fit=crop&q=80"
+      "/images/products/magaj_1.jpeg"
     ],
     "weights": [
       {
@@ -435,7 +435,7 @@ export const seedProducts = [
     "inStock": true,
     "featured": false,
     "images": [
-      "https://images.unsplash.com/photo-1553279768-865429fa0078?w=500&h=500&fit=crop&q=80"
+      "/images/products/dried-mango_1.jpeg"
     ],
     "weights": [
       {
@@ -466,7 +466,7 @@ export const seedProducts = [
     "inStock": true,
     "featured": false,
     "images": [
-      "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=500&h=500&fit=crop&q=80"
+      "/images/products/dried-strawberry_1.jpeg"
     ],
     "weights": [
       {
@@ -497,7 +497,7 @@ export const seedProducts = [
     "inStock": true,
     "featured": false,
     "images": [
-      "https://images.unsplash.com/photo-1585059895524-72359e06133a?w=500&h=500&fit=crop&q=80"
+      "/images/products/dried-kiwi_1.jpeg"
     ],
     "weights": [
       {
@@ -528,7 +528,7 @@ export const seedProducts = [
     "inStock": true,
     "featured": false,
     "images": [
-      "https://images.unsplash.com/photo-1601379760883-1bb497c558f0?w=500&h=500&fit=crop&q=80"
+      "/images/products/anjeer_1.jpeg"
     ],
     "weights": [
       {
@@ -580,7 +580,7 @@ export const seedProducts = [
   {
     "id": "pebble-chocolates",
     "name": "Pebble Chocolates",
-    "category": "Dried Fruits",
+    "category": "Sweets",
     "description": "Delightful milk chocolates shaped like colorful river pebbles. A sweet, crunchy, and nostalgic treat that everyone loves.",
     "nutrition": {
       "protein": "4g",
@@ -611,4 +611,4 @@ export const seedProducts = [
   }
 ];
 
-export const categories = ['All', 'Nuts', 'Dried Fruits', 'Seeds'];
+export const categories = ['All', 'Nuts', 'Dried Fruits', 'Seeds', 'Sweets'];

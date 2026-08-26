@@ -189,6 +189,75 @@
   margin-top: var(--space-xl);
 }
 
+/* Gift Packaging */
+.gift-option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  cursor: pointer;
+  padding: var(--space-md);
+  border: 2px solid var(--color-beige-dark);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.gift-option:hover {
+  border-color: var(--color-gold);
+}
+
+.gift-option__checkbox {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--color-brown);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.gift-option__content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gift-option__label {
+  font-weight: 600;
+  color: var(--color-brown-dark);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.gift-option__price {
+  font-size: 0.85rem;
+  color: var(--color-gold-dark);
+  font-weight: 600;
+}
+
+.gift-option__desc {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+/* Trust Badges */
+.checkout-trust {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+  margin: var(--space-lg) 0;
+  padding: var(--space-md);
+  background: var(--color-beige);
+  border-radius: var(--radius-md);
+}
+
+.checkout-trust__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--color-brown);
+  font-weight: 500;
+}
+
 /* UPI Payment */
 .upi-payment {
   text-align: center;

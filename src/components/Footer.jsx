@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { FiPhone, FiMail, FiMapPin, FiInstagram, FiFacebook } from 'react-icons/fi'
+import { FiPhone, FiMail, FiMapPin } from 'react-icons/fi'
 import './Footer.css'
 
 export default function Footer() {
@@ -23,7 +23,7 @@ export default function Footer() {
                 </div>
               </div>
               <p className="footer__desc">
-                Premium quality dry fruits sourced directly from the finest farms. 
+                Premium quality dry fruits sourced directly from the finest farms.
                 We deliver freshness and nutrition right to your doorstep.
               </p>
             </div>
@@ -33,6 +33,7 @@ export default function Footer() {
               <div className="footer__links">
                 <Link to="/" className="footer__link">Home</Link>
                 <Link to="/products" className="footer__link">Products</Link>
+                <Link to="/wishlist" className="footer__link">Saved Items</Link>
                 <Link to="/cart" className="footer__link">Cart</Link>
                 <Link to="/admin" className="footer__link">Seller Portal</Link>
               </div>
@@ -44,6 +45,7 @@ export default function Footer() {
                 <Link to="/products?category=Nuts" className="footer__link">Nuts</Link>
                 <Link to="/products?category=Dried Fruits" className="footer__link">Dried Fruits</Link>
                 <Link to="/products?category=Seeds" className="footer__link">Seeds</Link>
+                <Link to="/products?category=Sweets" className="footer__link">Sweets</Link>
               </div>
             </div>
 
@@ -60,20 +62,12 @@ export default function Footer() {
                   <FiMapPin size={16} /> Ludhiana, Punjab, India
                 </span>
               </div>
-              <div className="footer__social">
-                <a href="#" className="footer__social-link" aria-label="Instagram" title="Instagram">
-                  <FiInstagram size={20} />
-                </a>
-                <a href="#" className="footer__social-link" aria-label="Facebook" title="Facebook">
-                  <FiFacebook size={20} />
-                </a>
-              </div>
             </div>
           </div>
 
           <div className="footer__bottom">
             <p>© {new Date().getFullYear()} Shri Guru Ji Dry Fruits. All rights reserved.</p>
-            <p className="footer__tagline">Made with ❤️ for your health</p>
+            <p className="footer__tagline">Made with ❤️ by Nishtha Jain</p>
           </div>
         </div>
       </div>

@@ -1,39 +1,55 @@
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
-import { FiCreditCard, FiTruck, FiSmartphone } from 'react-icons/fi'
+import { FiCreditCard, FiTruck, FiSmartphone, FiGift, FiShield, FiCheckCircle, FiRefreshCw, FiMessageCircle } from 'react-icons/fi'
 import { useCart } from '../../context/CartContext'
-// import { useOrders } from '../../context/OrderContext'
 import { formatPrice, generateUPILink, MERCHANT_UPI_ID, generateOrderId } from '../../utils/payment'
 import toast from 'react-hot-toast'
 import './Checkout.css'
 
+const INDIAN_STATES = [
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar',
+  'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana',
+  'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala',
+  'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya',
+  'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
+  'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana',
+  'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+  'Andaman and Nicobar Islands', 'Chandigarh',
+  'Dadra and Nagar Haveli and Daman and Diu', 'Delhi',
+  'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry',
+]
+
 export default function Checkout() {
   const navigate = useNavigate()
   const { cart, getCartTotal, clearCart } = useCart()
-  // const { placeOrder } = useOrders()
 
   const [paymentMethod, setPaymentMethod] = useState('upi')
   const [showUPIQR, setShowUPIQR] = useState(false)
+  const [giftPackaging, setGiftPackaging] = useState(false)
   const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    address: '',
-    city: '',
-    state: '',
-    pincode: ''
+    name: '', phone: '', email: '',
+    address: '', city: '', state: '', pincode: ''
   })
   const [errors, setErrors] = useState({})
 
-  const subtotal = getCartTotal()
-  const deliveryCharge = subtotal > 500 ? 0 : 50
-  const total = subtotal + deliveryCharge
+  // Navigate away if cart is empty — useEffect avoids side effect during render
+  useEffect(() => {
+    if (cart.length === 0) navigate('/cart')
+  }, [cart.length, navigate])
 
-  if (cart.length === 0) {
-    navigate('/cart')
-    return null
-  }
+  const subtotal = getCartTotal()
+  const deliveryCharge = subtotal >= 500 ? 0 : 50
+  const giftCharge = giftPackaging ? 50 : 0
+  const total = subtotal + deliveryCharge + giftCharge
+
+  // Generate UPI link only when total changes, not on every render
+  const upiLink = useMemo(
+    () => generateUPILink(total, generateOrderId()),
+    [total]
+  )
+
+  if (cart.length === 0) return null
 
   function handleChange(e) {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -46,12 +62,12 @@ export default function Checkout() {
     const newErrors = {}
     if (!formData.name.trim()) newErrors.name = 'Name is required'
     if (!formData.phone.trim()) newErrors.phone = 'Phone number is required'
-    else if (!/^\d{10}$/.test(formData.phone.trim())) newErrors.phone = 'Enter valid 10-digit phone number'
+    else if (!/^\d{10}$/.test(formData.phone.trim())) newErrors.phone = 'Enter a valid 10-digit number'
     if (!formData.address.trim()) newErrors.address = 'Address is required'
     if (!formData.city.trim()) newErrors.city = 'City is required'
-    if (!formData.state.trim()) newErrors.state = 'State is required'
+    if (!formData.state) newErrors.state = 'Please select your state'
     if (!formData.pincode.trim()) newErrors.pincode = 'Pincode is required'
-    else if (!/^\d{6}$/.test(formData.pincode.trim())) newErrors.pincode = 'Enter valid 6-digit pincode'
+    else if (!/^\d{6}$/.test(formData.pincode.trim())) newErrors.pincode = 'Enter a valid 6-digit pincode'
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -61,19 +77,46 @@ export default function Checkout() {
       toast.error('Please fill in all required fields correctly')
       return
     }
-
     if (paymentMethod === 'upi') {
       setShowUPIQR(true)
       return
     }
-
-    // Cash on Delivery
     await submitOrder()
   }
 
   async function submitOrder() {
-    /* 
     const orderId = generateOrderId()
+    const brandPhoneNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '919999999999'
+
+    let message = `*New Order - Shri Guru Ji Dry Fruits* 🥜\n\n`
+    message += `*Order ID:* ${orderId}\n\n`
+    message += `*Customer Details:*\n`
+    message += `Name: ${formData.name}\n`
+    message += `Phone: ${formData.phone}\n`
+    if (formData.email) message += `Email: ${formData.email}\n`
+    message += `Address: ${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}\n\n`
+
+    message += `*Order Items:*\n`
+    cart.forEach(item => {
+      message += `- ${item.name} (${item.weight}) × ${item.quantity} = ${formatPrice(item.price * item.quantity)}\n`
+    })
+
+    message += `\n*Billing:*\n`
+    message += `Subtotal: ${formatPrice(subtotal)}\n`
+    message += `Delivery: ${deliveryCharge === 0 ? 'FREE' : formatPrice(deliveryCharge)}\n`
+    if (giftPackaging) message += `Gift Packaging: ${formatPrice(50)}\n`
+    message += `*Total Amount: ${formatPrice(total)}*\n\n`
+
+    message += `*Payment Method:* ${paymentMethod === 'upi' ? 'UPI / Google Pay' : 'Cash on Delivery'}\n`
+    if (giftPackaging) message += `🎁 *Gift Packaging requested*\n`
+    if (paymentMethod === 'upi') {
+      message += `_(Note: I have completed the UPI payment)_`
+    }
+
+    const encodedMessage = encodeURIComponent(message)
+    const whatsappUrl = `https://wa.me/${brandPhoneNumber}?text=${encodedMessage}`
+
+    // Build order object for confirmation page
     const order = {
       id: orderId,
       customer: formData,
@@ -86,51 +129,17 @@ export default function Checkout() {
       })),
       subtotal,
       deliveryCharge,
+      giftCharge,
       total,
-      paymentMethod: paymentMethod === 'upi' ? 'UPI / Google Pay' : 'Cash on Delivery'
+      paymentMethod: paymentMethod === 'upi' ? 'UPI / Google Pay' : 'Cash on Delivery',
+      giftPackaging
     }
 
-    await placeOrder(order)
-    clearCart()
-    toast.success('Order placed successfully!')
-    navigate('/order-confirmation', { state: { order } })
-    */
-
-    // New WhatsApp Flow
-    const brandPhoneNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '919999999999'
-    
-    let message = `*New Order - Shri Guru Ji Dry Fruits* 🥜\n\n`
-    message += `*Customer Details:*\n`
-    message += `Name: ${formData.name}\n`
-    message += `Phone: ${formData.phone}\n`
-    if (formData.email) message += `Email: ${formData.email}\n`
-    message += `Address: ${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}\n\n`
-    
-    message += `*Order Items:*\n`
-    cart.forEach(item => {
-      message += `- ${item.name} (${item.weight}) x ${item.quantity} = ${formatPrice(item.price * item.quantity)}\n`
-    })
-    
-    message += `\n*Billing:*\n`
-    message += `Subtotal: ${formatPrice(subtotal)}\n`
-    message += `Delivery: ${deliveryCharge === 0 ? 'FREE' : formatPrice(deliveryCharge)}\n`
-    message += `*Total Amount: ${formatPrice(total)}*\n\n`
-    
-    message += `*Payment Method:* ${paymentMethod === 'upi' ? 'UPI / Google Pay' : 'Cash on Delivery'}\n`
-    if (paymentMethod === 'upi') {
-      message += `_(Note: I have completed the UPI payment)_`
-    }
-
-    const encodedMessage = encodeURIComponent(message)
-    const whatsappUrl = `https://wa.me/${brandPhoneNumber}?text=${encodedMessage}`
-
-    clearCart()
-    toast.success('Redirecting to WhatsApp to complete your order!')
     window.open(whatsappUrl, '_blank')
-    navigate('/')
+    clearCart()
+    toast.success('Order sent via WhatsApp!')
+    navigate('/order-confirmation', { state: { order } })
   }
-
-  const upiLink = generateUPILink(total, 'GURUJI-' + Date.now())
 
   return (
     <div className="checkout-page">
@@ -147,101 +156,126 @@ export default function Checkout() {
 
               <div className="checkout-form__grid">
                 <div className="form-group">
-                  <label className="form-label">Full Name *</label>
+                  <label className="form-label" htmlFor="checkout-name">Full Name *</label>
                   <input
                     type="text"
                     name="name"
+                    id="checkout-name"
                     value={formData.name}
                     onChange={handleChange}
                     placeholder="Enter your full name"
                     className={errors.name ? 'input-error' : ''}
-                    id="checkout-name"
                   />
                   {errors.name && <span className="form-error">{errors.name}</span>}
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Phone Number *</label>
+                  <label className="form-label" htmlFor="checkout-phone">Phone Number *</label>
                   <input
                     type="tel"
                     name="phone"
+                    id="checkout-phone"
                     value={formData.phone}
                     onChange={handleChange}
                     placeholder="10-digit mobile number"
                     className={errors.phone ? 'input-error' : ''}
-                    id="checkout-phone"
                   />
                   {errors.phone && <span className="form-error">{errors.phone}</span>}
                 </div>
 
                 <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                  <label className="form-label">Email (optional)</label>
+                  <label className="form-label" htmlFor="checkout-email">Email (optional)</label>
                   <input
                     type="email"
                     name="email"
+                    id="checkout-email"
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="your.email@example.com"
-                    id="checkout-email"
                   />
                 </div>
 
                 <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                  <label className="form-label">Full Address *</label>
+                  <label className="form-label" htmlFor="checkout-address">Full Address *</label>
                   <textarea
                     name="address"
+                    id="checkout-address"
                     value={formData.address}
                     onChange={handleChange}
                     placeholder="House/Flat no., Street, Locality"
                     rows="3"
                     className={errors.address ? 'input-error' : ''}
-                    id="checkout-address"
                   />
                   {errors.address && <span className="form-error">{errors.address}</span>}
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">City *</label>
+                  <label className="form-label" htmlFor="checkout-city">City *</label>
                   <input
                     type="text"
                     name="city"
+                    id="checkout-city"
                     value={formData.city}
                     onChange={handleChange}
                     placeholder="City"
                     className={errors.city ? 'input-error' : ''}
-                    id="checkout-city"
                   />
                   {errors.city && <span className="form-error">{errors.city}</span>}
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">State *</label>
-                  <input
-                    type="text"
+                  <label className="form-label" htmlFor="checkout-state">State *</label>
+                  <select
                     name="state"
+                    id="checkout-state"
                     value={formData.state}
                     onChange={handleChange}
-                    placeholder="State"
                     className={errors.state ? 'input-error' : ''}
-                    id="checkout-state"
-                  />
+                  >
+                    <option value="">Select state</option>
+                    {INDIAN_STATES.map(s => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
                   {errors.state && <span className="form-error">{errors.state}</span>}
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Pincode *</label>
+                  <label className="form-label" htmlFor="checkout-pincode">Pincode *</label>
                   <input
                     type="text"
                     name="pincode"
+                    id="checkout-pincode"
                     value={formData.pincode}
                     onChange={handleChange}
                     placeholder="6-digit pincode"
                     className={errors.pincode ? 'input-error' : ''}
-                    id="checkout-pincode"
                   />
                   {errors.pincode && <span className="form-error">{errors.pincode}</span>}
                 </div>
               </div>
+            </div>
+
+            {/* Gift Packaging */}
+            <div className="checkout-section card">
+              <h3 className="checkout-section__title">
+                <FiGift size={20} /> Gift Options
+              </h3>
+              <label className="gift-option">
+                <input
+                  type="checkbox"
+                  checked={giftPackaging}
+                  onChange={(e) => setGiftPackaging(e.target.checked)}
+                  className="gift-option__checkbox"
+                />
+                <div className="gift-option__content">
+                  <span className="gift-option__label">
+                    🎁 Add gift packaging
+                    <span className="gift-option__price">+₹50</span>
+                  </span>
+                  <span className="gift-option__desc">Premium box with ribbon — perfect for festivals & celebrations</span>
+                </div>
+              </label>
             </div>
 
             {/* Payment Method */}
@@ -294,7 +328,7 @@ export default function Checkout() {
 
             <div className="checkout-summary__items">
               {cart.map(item => (
-                <div key={item.id} className="checkout-summary__item">
+                <div key={item.cartId} className="checkout-summary__item">
                   <img
                     src={item.images[0]}
                     alt={item.name}
@@ -305,7 +339,7 @@ export default function Checkout() {
                   />
                   <div className="checkout-summary__item-info">
                     <span className="checkout-summary__item-name">{item.name}</span>
-                    <span className="checkout-summary__item-qty">Qty: {item.quantity}</span>
+                    <span className="checkout-summary__item-qty">{item.weight} × {item.quantity}</span>
                   </div>
                   <span className="checkout-summary__item-price">{formatPrice(item.price * item.quantity)}</span>
                 </div>
@@ -319,13 +353,32 @@ export default function Checkout() {
               </div>
               <div className="checkout-summary__row">
                 <span>Delivery</span>
-                <span>{deliveryCharge === 0 ? <span className="text-green">FREE</span> : formatPrice(deliveryCharge)}</span>
+                <span>
+                  {deliveryCharge === 0
+                    ? <span className="text-green">FREE</span>
+                    : formatPrice(deliveryCharge)
+                  }
+                </span>
               </div>
+              {giftPackaging && (
+                <div className="checkout-summary__row">
+                  <span>🎁 Gift Packaging</span>
+                  <span>{formatPrice(50)}</span>
+                </div>
+              )}
               <div className="checkout-summary__divider"></div>
               <div className="checkout-summary__row checkout-summary__row--total">
                 <span>Total</span>
                 <span>{formatPrice(total)}</span>
               </div>
+            </div>
+
+            {/* Trust badges */}
+            <div className="checkout-trust">
+              <div className="checkout-trust__item"><FiShield size={14} /> Secure Payment</div>
+              <div className="checkout-trust__item"><FiCheckCircle size={14} /> 100% Natural</div>
+              <div className="checkout-trust__item"><FiRefreshCw size={14} /> Easy Returns</div>
+              <div className="checkout-trust__item"><FiMessageCircle size={14} /> WhatsApp Support</div>
             </div>
 
             {!showUPIQR ? (
@@ -340,7 +393,7 @@ export default function Checkout() {
               <div className="upi-payment">
                 <h4 className="upi-payment__title">Scan to Pay</h4>
                 <p className="upi-payment__desc">
-                  Scan this QR code with Google Pay, PhonePe, Paytm, or any UPI app
+                  Scan with Google Pay, PhonePe, Paytm, or any UPI app
                 </p>
                 <div className="upi-payment__qr">
                   <QRCodeSVG

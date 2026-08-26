@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { FiSearch, FiGrid, FiList } from 'react-icons/fi'
+import { FiSearch } from 'react-icons/fi'
 import { useProducts } from '../../context/ProductContext'
 import { categories } from '../../data/products'
 import ProductCard from '../../components/ProductCard'
@@ -10,20 +10,25 @@ export default function Products() {
   const { products, loading } = useProducts()
   const [searchParams, setSearchParams] = useSearchParams()
   const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'All')
   const [sortBy, setSortBy] = useState('name')
+
+  // Debounce search — wait 250ms after user stops typing
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 250)
+    return () => clearTimeout(timer)
+  }, [search])
 
   const filteredProducts = useMemo(() => {
     let result = [...products]
 
-    // Filter by category
     if (activeCategory !== 'All') {
       result = result.filter(p => p.category === activeCategory)
     }
 
-    // Filter by search
-    if (search.trim()) {
-      const query = search.toLowerCase()
+    if (debouncedSearch.trim()) {
+      const query = debouncedSearch.toLowerCase()
       result = result.filter(p =>
         p.name.toLowerCase().includes(query) ||
         p.description.toLowerCase().includes(query) ||
@@ -31,7 +36,6 @@ export default function Products() {
       )
     }
 
-    // Sort
     switch (sortBy) {
       case 'price-low':
         result.sort((a, b) => a.price - b.price)
@@ -45,7 +49,7 @@ export default function Products() {
     }
 
     return result
-  }, [products, activeCategory, search, sortBy])
+  }, [products, activeCategory, debouncedSearch, sortBy])
 
   function handleCategoryChange(cat) {
     setActiveCategory(cat)
@@ -70,14 +74,15 @@ export default function Products() {
       <div className="container">
         <div className="products-page__toolbar">
           <div className="products-page__search">
+            <label htmlFor="product-search" className="sr-only">Search products</label>
             <FiSearch size={18} className="products-page__search-icon" />
             <input
               type="text"
+              id="product-search"
               placeholder="Search products..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="products-page__search-input"
-              id="product-search"
             />
           </div>
 
@@ -99,6 +104,7 @@ export default function Products() {
               onChange={(e) => setSortBy(e.target.value)}
               className="products-page__sort"
               id="product-sort"
+              aria-label="Sort products"
             >
               <option value="name">Sort by Name</option>
               <option value="price-low">Price: Low to High</option>
