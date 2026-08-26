@@ -304,6 +304,185 @@
   margin-bottom: var(--space-md);
 }
 
+/* ============ PRODUCT MANAGER FORM ============ */
+.admin-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-xl);
+}
+
+.admin-modal__title {
+  font-size: 1.3rem;
+  margin: 0;
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.admin-section-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-sm);
+}
+
+.admin-weight-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.admin-weight-row input {
+  margin-bottom: 0;
+}
+
+.admin-image-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.admin-image-row input {
+  margin-bottom: 0;
+}
+
+.admin-add-row-btn {
+  background: none;
+  color: var(--color-gold-dark);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.admin-add-row-btn:hover {
+  color: var(--color-brown);
+}
+
+.admin-images-wrap {
+  display: flex;
+  gap: var(--space-lg);
+  align-items: flex-start;
+}
+
+.admin-images-inputs {
+  flex: 1;
+}
+
+.admin-image-preview {
+  width: 100px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.admin-image-preview img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-beige-dark);
+  display: none;
+}
+
+.admin-image-preview span {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  display: block;
+  margin-top: 4px;
+}
+
+.admin-nutrition-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-sm);
+}
+
+.admin-checkboxes {
+  display: flex;
+  gap: var(--space-xl);
+  margin: var(--space-lg) 0;
+}
+
+.admin-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-brown-dark);
+}
+
+.admin-checkbox-label input {
+  width: auto;
+  margin: 0;
+  accent-color: var(--color-brown);
+}
+
+/* ============ ORDER MANAGER FILTERS ============ */
+.admin-table-wrap__header {
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--color-beige-dark);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.admin-order-filters {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.admin-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-beige);
+  border-radius: var(--radius-xl);
+  padding: 6px 14px;
+  color: var(--color-text-muted);
+}
+
+.admin-search-input {
+  border: none;
+  background: transparent;
+  font-size: 0.875rem;
+  color: var(--color-brown-dark);
+  width: 220px;
+  padding: 0;
+  margin: 0;
+}
+
+.admin-search-input:focus {
+  outline: none;
+}
+
+.admin-status-filter {
+  padding: 6px 12px;
+  border-radius: var(--radius-xl);
+  font-size: 0.875rem;
+  border: 2px solid var(--color-beige-dark);
+  background: var(--color-white);
+  width: auto;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .dashboard-stats {
