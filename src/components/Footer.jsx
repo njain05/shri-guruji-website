@@ -52,8 +52,8 @@ export default function Footer() {
             <div className="footer__section">
               <h4 className="footer__heading">Contact Us</h4>
               <div className="footer__contact">
-                <a href="tel:+919876543210" className="footer__contact-item">
-                  <FiPhone size={16} /> +91 98765 43210
+                <a href="tel:+919815510684" className="footer__contact-item">
+                  <FiPhone size={16} /> +91 98155 10684
                 </a>
                 <a href="mailto:info@shriguruji.com" className="footer__contact-item">
                   <FiMail size={16} /> info@shriguruji.com
