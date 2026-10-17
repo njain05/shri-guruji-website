@@ -69,7 +69,7 @@ export default function Cart() {
                     alt={item.name}
                     className="cart-item__image"
                     onError={(e) => {
-                      e.target.src = `https://via.placeholder.com/120x120/F5F0E8/5C3D2E?text=${encodeURIComponent(item.name)}`
+                      e.target.onerror = null; e.target.src = '/images/placeholder.svg'
                     }}
                   />
                 </Link>

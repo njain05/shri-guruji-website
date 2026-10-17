@@ -2,7 +2,20 @@
 // Generates UPI payment links and QR code URLs
 
 // Set your UPI ID here
-export const MERCHANT_UPI_ID = import.meta.env.VITE_UPI_ID || 'yourupi@paytm'
+const RAW_UPI_ID = (import.meta.env.VITE_UPI_ID || '').trim()
+
+// Values that must never be treated as a real payee. If the UPI ID is missing
+// or still the sample from .env.example, UPI checkout stays switched off so no
+// customer is shown a QR code that pays nobody.
+const PLACEHOLDER_UPI_IDS = ['yourupi@paytm', 'your-real-upi@bank']
+
+// A usable UPI ID looks like name@handle.
+const UPI_ID_PATTERN = /^[\w.\-]{2,256}@[A-Za-z]{2,64}$/
+
+export const UPI_CONFIGURED =
+  UPI_ID_PATTERN.test(RAW_UPI_ID) && !PLACEHOLDER_UPI_IDS.includes(RAW_UPI_ID.toLowerCase())
+
+export const MERCHANT_UPI_ID = UPI_CONFIGURED ? RAW_UPI_ID : ''
 export const MERCHANT_NAME = 'Shri Guru Ji Dry Fruits'
 
 /**

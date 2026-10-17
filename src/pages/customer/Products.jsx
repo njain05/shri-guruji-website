@@ -6,6 +6,12 @@ import { categories } from '../../data/products'
 import ProductCard from '../../components/ProductCard'
 import './Products.css'
 
+// Products are priced per weight variant, so sort on the cheapest pack.
+function lowestPrice(product) {
+  if (!product.weights?.length) return Number.POSITIVE_INFINITY
+  return Math.min(...product.weights.map(w => w.price))
+}
+
 export default function Products() {
   const { products, loading } = useProducts()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -38,10 +44,10 @@ export default function Products() {
 
     switch (sortBy) {
       case 'price-low':
-        result.sort((a, b) => a.price - b.price)
+        result.sort((a, b) => lowestPrice(a) - lowestPrice(b))
         break
       case 'price-high':
-        result.sort((a, b) => b.price - a.price)
+        result.sort((a, b) => lowestPrice(b) - lowestPrice(a))
         break
       case 'name':
       default:

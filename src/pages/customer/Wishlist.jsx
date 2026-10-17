@@ -53,7 +53,7 @@ export default function Wishlist() {
                   className="wishlist-card__image"
                   loading="lazy"
                   onError={(e) => {
-                    e.target.src = `https://via.placeholder.com/300x300/F5F0E8/5C3D2E?text=${encodeURIComponent(product.name)}`
+                    e.target.onerror = null; e.target.src = '/images/placeholder.svg'
                   }}
                 />
               </Link>

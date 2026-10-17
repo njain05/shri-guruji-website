@@ -101,7 +101,7 @@ export default function ProductDetail() {
                 alt={product.name}
                 className="product-detail__image"
                 onError={(e) => {
-                  e.target.src = `https://via.placeholder.com/600x600/F5F0E8/5C3D2E?text=${encodeURIComponent(product.name)}`
+                  e.target.onerror = null; e.target.src = '/images/placeholder.svg'
                 }}
               />
               {product.featured && (
@@ -242,7 +242,7 @@ export default function ProductDetail() {
                     className="related-card__img"
                     loading="lazy"
                     onError={(e) => {
-                      e.target.src = `https://via.placeholder.com/300x300/F5F0E8/5C3D2E?text=${encodeURIComponent(p.name)}`
+                      e.target.onerror = null; e.target.src = '/images/placeholder.svg'
                     }}
                   />
                   <div className="related-card__info">
@@ -269,7 +269,7 @@ export default function ProductDetail() {
                     className="related-card__img"
                     loading="lazy"
                     onError={(e) => {
-                      e.target.src = `https://via.placeholder.com/300x300/F5F0E8/5C3D2E?text=${encodeURIComponent(p.name)}`
+                      e.target.onerror = null; e.target.src = '/images/placeholder.svg'
                     }}
                   />
                   <div className="related-card__info">

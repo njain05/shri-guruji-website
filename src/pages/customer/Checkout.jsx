@@ -4,7 +4,7 @@ import { QRCodeSVG } from 'qrcode.react'
 import { FiCreditCard, FiTruck, FiSmartphone, FiGift, FiShield, FiCheckCircle, FiRefreshCw, FiMessageCircle } from 'react-icons/fi'
 import { useCart } from '../../context/CartContext'
 import { useOrders } from '../../context/OrderContext'
-import { formatPrice, generateUPILink, MERCHANT_UPI_ID, generateOrderId } from '../../utils/payment'
+import { formatPrice, generateUPILink, MERCHANT_UPI_ID, UPI_CONFIGURED, generateOrderId } from '../../utils/payment'
 import toast from 'react-hot-toast'
 import './Checkout.css'
 
@@ -26,7 +26,7 @@ export default function Checkout() {
   const { cart, getCartTotal, clearCart } = useCart()
   const { placeOrder } = useOrders()
 
-  const [paymentMethod, setPaymentMethod] = useState('upi')
+  const [paymentMethod, setPaymentMethod] = useState(UPI_CONFIGURED ? 'upi' : 'cod')
   const [showUPIQR, setShowUPIQR] = useState(false)
   const [giftPackaging, setGiftPackaging] = useState(false)
   const [formData, setFormData] = useState({
@@ -79,7 +79,7 @@ export default function Checkout() {
       toast.error('Please fill in all required fields correctly')
       return
     }
-    if (paymentMethod === 'upi') {
+    if (UPI_CONFIGURED && paymentMethod === 'upi') {
       setShowUPIQR(true)
       return
     }
@@ -288,6 +288,7 @@ export default function Checkout() {
               </h3>
 
               <div className="payment-options">
+                {UPI_CONFIGURED && (
                 <label className={`payment-option ${paymentMethod === 'upi' ? 'payment-option--active' : ''}`}>
                   <input
                     type="radio"
@@ -304,6 +305,7 @@ export default function Checkout() {
                     </div>
                   </div>
                 </label>
+                )}
 
                 <label className={`payment-option ${paymentMethod === 'cod' ? 'payment-option--active' : ''}`}>
                   <input
@@ -337,7 +339,7 @@ export default function Checkout() {
                     alt={item.name}
                     className="checkout-summary__item-img"
                     onError={(e) => {
-                      e.target.src = `https://via.placeholder.com/60x60/F5F0E8/5C3D2E?text=${encodeURIComponent(item.name)}`
+                      e.target.onerror = null; e.target.src = '/images/placeholder.svg'
                     }}
                   />
                   <div className="checkout-summary__item-info">

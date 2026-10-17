@@ -61,7 +61,7 @@ export default function ProductCard({ product }) {
           className="product-card__image"
           loading="lazy"
           onError={(e) => {
-            e.target.src = `https://via.placeholder.com/400x400/F5F0E8/5C3D2E?text=${encodeURIComponent(product.name)}`
+            e.target.onerror = null; e.target.src = '/images/placeholder.svg'
           }}
         />
         {product.featured && (

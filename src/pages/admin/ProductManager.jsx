@@ -20,7 +20,7 @@ const EMPTY_FORM = {
 }
 
 export default function ProductManager() {
-  const { isAdmin, logout } = useAuth()
+  const { isAdmin, loading, logout } = useAuth()
   const { products, addProduct, updateProduct, deleteProduct } = useProducts()
   const location = useLocation()
 
@@ -28,6 +28,7 @@ export default function ProductManager() {
   const [editingProduct, setEditingProduct] = useState(null)
   const [formData, setFormData] = useState(EMPTY_FORM)
 
+  if (loading) return <div className="admin-page"><div className="container"><p style={{ padding: '6rem 0' }}>Loading…</p></div></div>
   if (!isAdmin) return <Navigate to="/admin" replace />
 
   function openAddModal() {
@@ -201,7 +202,7 @@ export default function ProductManager() {
                           src={product.images?.[0]}
                           alt={product.name}
                           style={{ width: 44, height: 44, borderRadius: 8, objectFit: 'cover', background: 'var(--color-beige)', flexShrink: 0 }}
-                          onError={(e) => { e.target.src = `https://via.placeholder.com/44x44/F5F0E8/5C3D2E?text=${product.name[0]}` }}
+                          onError={(e) => { e.target.onerror = null; e.target.src = '/images/placeholder.svg' }}
                         />
                         <strong>{product.name}</strong>
                       </div>
