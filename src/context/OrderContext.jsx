@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { supabase } from '../utils/supabase.js'
+import { useAuth } from './AuthContext.jsx'
 
 const OrderContext = createContext()
 
@@ -10,12 +11,9 @@ export function useOrders() {
 export function OrderProvider({ children }) {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
+  const { isAdmin, loading: authLoading } = useAuth()
 
-  useEffect(() => {
-    loadOrders()
-  }, [])
-
-  async function loadOrders() {
+  const loadOrders = useCallback(async function loadOrders() {
     if (!supabase) {
       // Use localStorage fallback
       try {
@@ -44,7 +42,18 @@ export function OrderProvider({ children }) {
       }
     }
     setLoading(false)
-  }
+  }, [isAdmin])
+
+  // Orders are admin-only under RLS, and a SELECT that RLS filters out comes
+  // back as an empty list rather than an error. Fetching once on mount would
+  // therefore run while the visitor is still anonymous, quietly return nothing,
+  // and never retry — leaving the Order Manager permanently empty after login.
+  // So re-fetch whenever the admin session resolves or changes.
+  useEffect(() => {
+    if (authLoading) return
+    loadOrders()
+  }, [isAdmin, authLoading, loadOrders])
+
 
   async function placeOrder(orderData) {
     const order = {
