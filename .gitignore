@@ -8,7 +8,6 @@ dist-ssr/
 # local env files (secrets)
 .env
 .env.*
-!.env.example
 
 # logs
 npm-debug.log*
@@ -28,3 +27,5 @@ Thumbs.db
 
 # local raw image source
 pics/
+.vercel
+!.env.example

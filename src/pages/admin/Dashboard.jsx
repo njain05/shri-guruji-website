@@ -7,11 +7,12 @@ import { formatPrice } from '../../utils/payment'
 import './Admin.css'
 
 export default function Dashboard() {
-  const { isAdmin, logout } = useAuth()
+  const { isAdmin, loading, logout } = useAuth()
   const { products } = useProducts()
   const { orders, getOrderStats } = useOrders()
   const location = useLocation()
 
+  if (loading) return <div className="admin-page"><div className="container"><p style={{ padding: '6rem 0' }}>Loading…</p></div></div>
   if (!isAdmin) return <Navigate to="/admin" replace />
 
   const stats = getOrderStats()

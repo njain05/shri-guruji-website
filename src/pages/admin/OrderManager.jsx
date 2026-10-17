@@ -10,13 +10,14 @@ import './Admin.css'
 const ORDER_STATUSES = ['Pending Payment', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled']
 
 export default function OrderManager() {
-  const { isAdmin, logout } = useAuth()
+  const { isAdmin, loading, logout } = useAuth()
   const { orders, updateOrderStatus } = useOrders()
   const location = useLocation()
 
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
 
+  if (loading) return <div className="admin-page"><div className="container"><p style={{ padding: '6rem 0' }}>Loading…</p></div></div>
   if (!isAdmin) return <Navigate to="/admin" replace />
 
   const filtered = orders.filter(order => {
