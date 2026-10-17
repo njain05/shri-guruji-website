@@ -29,7 +29,12 @@ export function ProductProvider({ children }) {
       if (error) throw error
 
       if (!data || data.length === 0) {
-        await seedSupabaseProducts()
+        // The products table is empty. Writing to it from here would be
+        // rejected anyway: RLS limits product writes to admins, and the
+        // storefront runs as the anon role. Seed it once by running
+        // supabase-seed.sql in the Supabase SQL Editor.
+        console.warn('Supabase has no products yet — run supabase-seed.sql. Using local catalogue for now.')
+        setProducts(seedProducts)
       } else {
         setProducts(data)
       }
@@ -40,21 +45,6 @@ export function ProductProvider({ children }) {
     setLoading(false)
   }
 
-  async function seedSupabaseProducts() {
-    if (!supabase) {
-      setProducts(seedProducts)
-      return
-    }
-
-    try {
-      const { error } = await supabase.from('products').upsert(seedProducts, { onConflict: 'id' })
-      if (error) throw error
-      setProducts(seedProducts)
-    } catch (error) {
-      console.error('Error seeding products:', error)
-      setProducts(seedProducts)
-    }
-  }
 
   async function addProduct(product) {
     const newProduct = { ...product, id: product.id || Date.now().toString() }
