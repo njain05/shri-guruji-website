@@ -19,9 +19,20 @@
   --color-espresso: #1C1917;
   --color-ink-60:   #57504A;
   --color-ink-40:   #8A8077;
-  --color-marigold: #D97706;
-  --color-marigold-deep: #B45309;
-  --color-maroon:   #6B1D2F;
+  /* Sampled from the packaging label so the site matches what arrives
+     in the customer's hands. Brown is the action colour, red is reserved
+     for gifting and festival, green only ever appears as a small mark —
+     it is vivid, and a little of it goes a long way on linen. */
+  --color-brand:       #7F380C;
+  --color-brand-deep:  #5E2908;
+  --color-red:         #BF1925;
+  --color-red-deep:    #8E1019;
+  --color-leaf:        #06701A;
+
+  /* kept so any not-yet-redesigned markup still resolves */
+  --color-marigold: #7F380C;
+  --color-marigold-deep: #5E2908;
+  --color-maroon:   #8E1019;
 
   --font-display: "Playfair Display", Georgia, serif;
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;

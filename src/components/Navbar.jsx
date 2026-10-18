@@ -20,14 +20,13 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-linen/95 backdrop-blur-sm border-b rule">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="flex items-baseline justify-between gap-6 py-4">
-          <Link to="/" className="shrink-0 leading-none">
-            <span className="block font-display text-2xl sm:text-[1.6rem] tracking-tight">
-              {BRAND.name}
-            </span>
-            <span className="block font-display italic text-ink-40 text-sm -mt-0.5">
-              {BRAND.trade}
-            </span>
+        <div className="flex items-center justify-between gap-6 py-3.5">
+          <Link to="/" className="shrink-0" aria-label={`${BRAND.name} ${BRAND.trade}, home`}>
+            <img
+              src="/images/logo-mark.png"
+              alt={`${BRAND.name} ${BRAND.trade}`}
+              className="h-14 sm:h-16 w-auto"
+            />
           </Link>
 
           <nav className="hidden md:flex items-baseline gap-8 text-[0.95rem]">
@@ -38,7 +37,7 @@ export default function Navbar() {
                 className={({ isActive }) =>
                   `pb-0.5 border-b transition-colors ${
                     isActive
-                      ? 'border-marigold text-espresso'
+                      ? 'border-brand text-espresso'
                       : 'border-transparent text-ink-60 hover:text-espresso'
                   }`
                 }

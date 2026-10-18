@@ -6,80 +6,61 @@ import { useCart } from '../../context/CartContext'
 import { BRAND } from '../../data/brand'
 import { glossFor, lowestPrice, formatINR, perKilo } from '../../data/glossary'
 
-function HeroGood({ product }) {
-  const { addToCart } = useCart()
-  const [idx, setIdx] = useState(product.weights.length > 1 ? 1 : 0)
-  const weight = product.weights[idx]
-  const kilo = perKilo(weight)
-
+function Hero() {
   return (
-    <section className="border-b rule">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-20 grid lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-16 items-center">
-        <div>
-          <p className="text-ink-60 text-[0.95rem]">{BRAND.masthead}</p>
-
-          <h1 className="font-display text-good leading-[0.92] tracking-[-0.02em] mt-5">
-            {product.name}
+    <section className="border-b rule overflow-hidden">
+      <div className="mx-auto max-w-[1180px] px-5 sm:px-8 py-14 lg:py-24
+                      grid lg:grid-cols-[1.02fr_0.98fr] gap-12 lg:gap-20 items-center">
+        <div className="text-center lg:text-left">
+          <h1 className="font-display text-[clamp(2.9rem,6.4vw,4.9rem)] leading-[0.98] tracking-[-0.022em]">
+            {BRAND.tagline}
           </h1>
-          <p className="font-display italic text-2xl sm:text-3xl text-ink-40 mt-2">
-            {glossFor(product)}
+
+          <p className="text-ink-60 text-lg leading-relaxed mt-6 max-w-[46ch] mx-auto lg:mx-0">
+            {BRAND.heroLead}
           </p>
 
-          <p className="text-ink-60 leading-relaxed max-w-[52ch] mt-6">
-            {product.description}
-          </p>
-
-          <div className="mt-8">
-            <div className="flex flex-wrap gap-2">
-              {product.weights.map((w, i) => (
-                <button
-                  key={w.size}
-                  onClick={() => setIdx(i)}
-                  aria-pressed={i === idx}
-                  className={`px-4 py-2.5 border transition-colors ${
-                    i === idx
-                      ? 'bg-espresso text-linen border-espresso'
-                      : 'bg-transparent text-ink-60 border-espresso/15 hover:border-espresso/40'
-                  }`}
-                >
-                  <span className="tabular-nums">{w.size}</span>
-                  <span className="ml-3 tabular-nums">{formatINR(w.price)}</span>
-                </button>
-              ))}
-            </div>
-
-            {kilo && (
-              <p className="text-ink-40 text-sm mt-3 tabular-nums">
-                {formatINR(kilo)} per kilo
-              </p>
-            )}
-          </div>
-
-          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <button
-              onClick={() => {
-                addToCart(product, 1, weight)
-                toast.success(`${product.name} ${weight.size} added`)
-              }}
-              className="bg-marigold text-white px-7 py-3.5 font-medium hover:bg-marigold-deep transition-colors"
+          <div className="mt-9 flex flex-wrap gap-3 justify-center lg:justify-start">
+            <Link
+              to="/products"
+              className="bg-brand text-white px-8 py-4 font-medium hover:bg-brand-deep transition-colors"
             >
-              Add to basket
-            </button>
-            <Link to={`/products/${product.id}`} className="text-ink-60 underline underline-offset-4 hover:text-espresso">
-              See details
+              Shop the range
+            </Link>
+            <Link
+              to="/gifting"
+              className="border border-espresso/25 px-8 py-4 font-medium hover:border-espresso hover:bg-almond/60 transition-colors"
+            >
+              Diwali gift boxes
             </Link>
           </div>
+
+          <dl className="mt-10 pt-6 border-t rule flex flex-wrap justify-center lg:justify-start
+                         gap-x-9 gap-y-3 text-sm">
+            <div>
+              <dt className="text-ink-40">Licensed food business</dt>
+              <dd className="text-leaf tabular-nums mt-0.5">FSSAI {BRAND.fssai}</dd>
+            </div>
+            <div>
+              <dt className="text-ink-40">Packed in</dt>
+              <dd className="mt-0.5">{BRAND.city}, {BRAND.state}</dd>
+            </div>
+            <div>
+              <dt className="text-ink-40">Delivery</dt>
+              <dd className="mt-0.5">Free over {formatINR(BRAND.delivery.freeAbove)}</dd>
+            </div>
+          </dl>
         </div>
 
-        <div className="order-first lg:order-last">
-          <div className="bg-white border rule aspect-[4/5] flex items-center justify-center p-6">
-            <img
-              src={product.images[0]}
-              alt={product.name}
-              className="max-w-full max-h-full object-contain"
-              onError={(e) => { e.target.onerror = null; e.target.src = '/images/placeholder.svg' }}
-            />
-          </div>
+        <div className="relative mx-auto w-full max-w-[560px]">
+          <div className="absolute -inset-3 bg-almond -z-10" aria-hidden="true" />
+          <img
+            src="/hero-dry-fruits.png"
+            alt="Bowls of almonds, cashews, pistachios, walnuts, raisins, dates and figs"
+            width="640"
+            height="640"
+            className="w-full aspect-square object-cover"
+          />
         </div>
       </div>
     </section>
@@ -117,7 +98,7 @@ function GoodRow({ product }) {
 
       <div className="text-right shrink-0">
         <span className="block text-ink-40 text-sm">from</span>
-        <span className="block text-lg tabular-nums group-hover:text-marigold transition-colors">
+        <span className="block text-lg tabular-nums group-hover:text-brand transition-colors">
           {formatINR(lowestPrice(product))}
         </span>
       </div>
@@ -127,9 +108,8 @@ function GoodRow({ product }) {
 
 export default function Home() {
   const { products, loading } = useProducts()
-  const hero = products.find(p => p.featured) || products[0]
 
-  if (loading || !hero) {
+  if (loading || !products.length) {
     return (
       <div className="mx-auto max-w-6xl px-4 sm:px-6 py-24">
         <p className="text-ink-40">Loading the day's rates…</p>
@@ -139,7 +119,7 @@ export default function Home() {
 
   return (
     <>
-      <HeroGood product={hero} />
+      <Hero />
 
       {/* Rate list — the native document of this trade */}
       <section className="mx-auto max-w-6xl px-4 sm:px-6 py-14 sm:py-20">
@@ -158,7 +138,7 @@ export default function Home() {
       </section>
 
       {/* Gifting — the only place maroon appears */}
-      <section className="bg-maroon text-linen">
+      <section className="bg-red-deep text-linen">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-20 grid md:grid-cols-[1.2fr_1fr] gap-10 items-center">
           <div>
             <h2 className="font-display text-4xl sm:text-5xl leading-[1.05]">
@@ -170,7 +150,7 @@ export default function Home() {
             </p>
             <Link
               to="/gifting"
-              className="inline-block mt-7 bg-linen text-maroon px-7 py-3.5 font-medium hover:bg-almond transition-colors"
+              className="inline-block mt-7 bg-linen text-red-deep px-7 py-3.5 font-medium hover:bg-almond transition-colors"
             >
               Build a box
             </Link>

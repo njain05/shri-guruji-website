@@ -5,11 +5,26 @@
 export const BRAND = {
   name: 'Shri Guru Ji',
   trade: 'Dry Fruits',
+  legalName: 'Shri Guruji Traders',
   city: 'Ludhiana',
   state: 'Punjab',
+  pincode: '141008',
+
+  // From the packaging. This is the brand's own voice — use it, don't invent one.
+  tagline: 'Crunch Into Happiness',
+
+  // Printed on every pouch, and the thing that tells a stranger buying food
+  // online that this is a registered food business.
+  fssai: '12124999000222',
+  instagram: 'shrigurujidryfruits',
+  // TODO: two numbers exist — the label says +91 950135512, the site footer
+  // says +91 98155 10684. Tell me which one customers should call.
+  phone: '+91 98155 10684',
 
   // One line that explains the whole business to a stranger.
   masthead: 'A Ludhiana wholesale house, now packing for homes.',
+
+  heroLead: 'Almonds, cashews, pistachios and figs — the same grades we supply to shops across Punjab, now weighed and packed for your home.',
 
   story: {
     heading: 'The same goods we sell to shops',
