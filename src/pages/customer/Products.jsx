@@ -1,155 +1,138 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { FiSearch } from 'react-icons/fi'
+import { FiSearch, FiX } from 'react-icons/fi'
 import { useProducts } from '../../context/ProductContext'
 import { categories } from '../../data/products'
 import ProductCard from '../../components/ProductCard'
-import './Products.css'
-
-// Products are priced per weight variant, so sort on the cheapest pack.
-function lowestPrice(product) {
-  if (!product.weights?.length) return Number.POSITIVE_INFINITY
-  return Math.min(...product.weights.map(w => w.price))
-}
+import { lowestPrice, hindiFor } from '../../data/glossary'
 
 export default function Products() {
   const { products, loading } = useProducts()
   const [searchParams, setSearchParams] = useSearchParams()
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
-  const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'All')
   const [sortBy, setSortBy] = useState('name')
 
-  // Debounce search — wait 250ms after user stops typing
+  // The category lives in the URL, not in state. Reading it once on mount meant
+  // footer links and back/forward changed the address but never the filter.
+  const activeCategory = searchParams.get('category') || 'All'
+
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(search), 250)
-    return () => clearTimeout(timer)
+    const t = setTimeout(() => setDebouncedSearch(search), 250)
+    return () => clearTimeout(t)
   }, [search])
 
-  const filteredProducts = useMemo(() => {
+  const filtered = useMemo(() => {
     let result = [...products]
-
-    if (activeCategory !== 'All') {
-      result = result.filter(p => p.category === activeCategory)
-    }
-
-    if (debouncedSearch.trim()) {
-      const query = debouncedSearch.toLowerCase()
+    if (activeCategory !== 'All') result = result.filter(p => p.category === activeCategory)
+    const q = debouncedSearch.trim().toLowerCase()
+    if (q) {
       result = result.filter(p =>
-        p.name.toLowerCase().includes(query) ||
-        p.description.toLowerCase().includes(query) ||
-        p.category.toLowerCase().includes(query)
+        p.name.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q) ||
+        hindiFor(p).includes(debouncedSearch.trim())
       )
     }
-
-    switch (sortBy) {
-      case 'price-low':
-        result.sort((a, b) => lowestPrice(a) - lowestPrice(b))
-        break
-      case 'price-high':
-        result.sort((a, b) => lowestPrice(b) - lowestPrice(a))
-        break
-      case 'name':
-      default:
-        result.sort((a, b) => a.name.localeCompare(b.name))
-    }
-
+    if (sortBy === 'price-low') result.sort((a, b) => lowestPrice(a) - lowestPrice(b))
+    else if (sortBy === 'price-high') result.sort((a, b) => lowestPrice(b) - lowestPrice(a))
+    else result.sort((a, b) => a.name.localeCompare(b.name))
     return result
   }, [products, activeCategory, debouncedSearch, sortBy])
 
-  function handleCategoryChange(cat) {
-    setActiveCategory(cat)
-    if (cat === 'All') {
-      setSearchParams({})
-    } else {
-      setSearchParams({ category: cat })
-    }
+  function setCategory(cat) {
+    if (cat === 'All') setSearchParams({})
+    else setSearchParams({ category: cat })
+  }
+
+  function clearAll() {
+    setSearch('')
+    setDebouncedSearch('')
+    setSearchParams({})
   }
 
   return (
-    <div className="products-page">
-      <div className="products-page__header">
-        <div className="container">
-          <h1 className="products-page__title">Our Products</h1>
-          <p className="products-page__subtitle">
-            Explore our premium collection of dry fruits and seeds
-          </p>
-        </div>
-      </div>
+    <div className="container-page pt-10 sm:pt-14">
+      <header className="max-w-2xl">
+        <h1 className="font-display font-normal text-[clamp(2.6rem,5vw,3.8rem)] leading-none tracking-[-0.02em]">
+          {activeCategory === 'All' ? 'The shop' : activeCategory}
+        </h1>
+        <p className="text-muted text-lg mt-3">
+          Every good comes in 250 g, 500 g and 1 kg packs, weighed and sealed to order.
+        </p>
+      </header>
 
-      <div className="container">
-        <div className="products-page__toolbar">
-          <div className="products-page__search">
-            <label htmlFor="product-search" className="sr-only">Search products</label>
-            <FiSearch size={18} className="products-page__search-icon" />
+      <div className="mt-9 flex flex-col lg:flex-row lg:items-center gap-4 lg:justify-between border-b hairline pb-6">
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by kind">
+          {categories.map(cat => {
+            const on = activeCategory === cat
+            return (
+              <button
+                key={cat}
+                onClick={() => setCategory(cat)}
+                aria-pressed={on}
+                className={`rounded-[var(--radius-field)] px-4 py-2 text-[0.98rem] border transition-colors ${
+                  on ? 'bg-olive text-paper border-olive' : 'bg-paper text-ink hairline hover:bg-well'
+                }`}
+              >
+                {cat}
+              </button>
+            )
+          })}
+        </div>
+
+        <div className="flex gap-3">
+          <div className="relative flex-1 lg:w-72">
+            <label htmlFor="product-search" className="sr-only">Search the shop</label>
+            <FiSearch size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-faint pointer-events-none" />
             <input
-              type="text"
               id="product-search"
-              placeholder="Search products..."
+              type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="products-page__search-input"
+              placeholder="Search kaju, anjeer, seeds…"
+              className="field !pl-10"
             />
           </div>
-
-          <div className="products-page__filters">
-            <div className="products-page__categories">
-              {categories.map(cat => (
-                <button
-                  key={cat}
-                  className={`products-page__cat-btn ${activeCategory === cat ? 'products-page__cat-btn--active' : ''}`}
-                  onClick={() => handleCategoryChange(cat)}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="products-page__sort"
-              id="product-sort"
-              aria-label="Sort products"
-            >
-              <option value="name">Sort by Name</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-            </select>
-          </div>
+          <label htmlFor="product-sort" className="sr-only">Sort</label>
+          <select id="product-sort" value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="field !w-auto">
+            <option value="name">Name</option>
+            <option value="price-low">Price, low to high</option>
+            <option value="price-high">Price, high to low</option>
+          </select>
         </div>
-
-        {loading ? (
-          <div className="grid-4">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-              <div key={i} className="skeleton-card card">
-                <div className="skeleton skeleton--image"></div>
-                <div className="skeleton skeleton--text"></div>
-                <div className="skeleton skeleton--text-sm"></div>
-              </div>
-            ))}
-          </div>
-        ) : filteredProducts.length === 0 ? (
-          <div className="products-page__empty">
-            <span className="products-page__empty-icon">🔍</span>
-            <h3>No products found</h3>
-            <p>Try adjusting your search or category filter</p>
-          </div>
-        ) : (
-          <>
-            <p className="products-page__count">
-              Showing {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''}
-            </p>
-            <div className="grid-4">
-              {filteredProducts.map((product, index) => (
-                <div key={product.id} style={{ animationDelay: `${index * 0.05}s` }} className="animate-fade-in-up">
-                  <ProductCard product={product} />
-                </div>
-              ))}
-            </div>
-          </>
-        )}
       </div>
+
+      {loading ? (
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-9 sm:gap-x-6" aria-busy="true">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i}>
+              <div className="aspect-square rounded-[var(--radius-media)] bg-well animate-pulse" />
+              <div className="h-4 w-2/3 mt-4 rounded bg-well animate-pulse" />
+              <div className="h-4 w-1/3 mt-2 rounded bg-well animate-pulse" />
+            </div>
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="py-24 text-center">
+          <h2 className="font-display text-2xl">Nothing matches that</h2>
+          <p className="text-muted mt-2">
+            Try a different word, or look through everything we stock.
+          </p>
+          <button onClick={clearAll} className="button-quiet mt-6">
+            <FiX size={16} /> Clear search and filters
+          </button>
+        </div>
+      ) : (
+        <>
+          <p className="text-faint mt-6 mb-5" aria-live="polite">
+            {filtered.length} {filtered.length === 1 ? 'good' : 'goods'}
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10 sm:gap-x-6">
+            {filtered.map(p => <ProductCard key={p.id} product={p} />)}
+          </div>
+        </>
+      )}
     </div>
   )
 }

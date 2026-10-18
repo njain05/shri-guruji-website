@@ -1,5 +1,8 @@
+import { useLocation } from 'react-router-dom'
 
 export default function WhatsAppButton() {
+  // Product pages have a sticky buy bar on mobile; lift above it there.
+  const onProduct = /^\/products\/[^/]+/.test(useLocation().pathname)
   const phoneNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '919999999999'
   const message = encodeURIComponent('Hi! I have a question about Shri Guru Ji Dry Fruits. 🥜')
   const url = `https://wa.me/${phoneNumber}?text=${message}`
@@ -9,7 +12,7 @@ export default function WhatsAppButton() {
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-5 right-5 z-40 flex items-center gap-2 bg-espresso text-linen pl-4 pr-5 py-3 shadow-lg hover:bg-marigold transition-colors"
+      className={`fixed ${onProduct ? "bottom-24 lg:bottom-5" : "bottom-5"} right-5 z-40 flex items-center gap-2 rounded-[var(--radius-field)] bg-olive text-paper pl-3.5 pr-4 py-2.5 shadow-[0_10px_28px_-10px_rgba(35,40,31,0.5)] hover:bg-olive-deep transition-colors`}
       aria-label="Chat with us on WhatsApp"
       title="Chat on WhatsApp"
     >

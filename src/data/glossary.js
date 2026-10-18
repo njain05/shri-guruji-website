@@ -24,6 +24,34 @@ export const GLOSS = {
   'pebble-chocolates': 'Chocolate pebbles',
 }
 
+// The names these goods carry on Indian shelves. Shown beside the English
+// so the page reads the way the trade actually labels them. A good with no
+// traditional name (chocolate pebbles) simply shows none.
+export const HINDI = {
+  'badam-giri': 'बादाम गिरी',
+  'pista': 'पिस्ता',
+  'kaju': 'काजू',
+  'roasted-kaju': 'भुना काजू',
+  'kismish': 'किशमिश',
+  'black-raisin': 'काली किशमिश',
+  'walnut': 'अखरोट',
+  'chia-seeds': 'चिया बीज',
+  'pumpkin-seeds': 'कद्दू के बीज',
+  'sunflower-seeds': 'सूरजमुखी के बीज',
+  'magaj': 'मगज़',
+  'mix-seeds': 'मिक्स बीज',
+  'dried-fruit-mix': 'मिक्स मेवा',
+  'dried-mango': 'सूखा आम',
+  'dried-strawberry': 'सूखी स्ट्रॉबेरी',
+  'dried-kiwi': 'सूखी कीवी',
+  'anjeer': 'अंजीर',
+  'dates': 'खजूर',
+}
+
+export function hindiFor(product) {
+  return HINDI[product?.id] || ''
+}
+
 export function glossFor(product) {
   return GLOSS[product?.id] || product?.category || ''
 }

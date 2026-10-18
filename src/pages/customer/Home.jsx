@@ -1,65 +1,58 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import toast from 'react-hot-toast'
 import { useProducts } from '../../context/ProductContext'
-import { useCart } from '../../context/CartContext'
+import ProductCard from '../../components/ProductCard'
 import { BRAND } from '../../data/brand'
-import { glossFor, lowestPrice, formatINR, perKilo } from '../../data/glossary'
+import { formatINR } from '../../data/glossary'
+
+const KINDS = [
+  { name: 'Nuts', blurb: 'Badam, kaju, pista, akhrot' },
+  { name: 'Dried Fruits', blurb: 'Anjeer, khajoor, kishmish' },
+  { name: 'Seeds', blurb: 'Chia, pumpkin, magaz' },
+  { name: 'Sweets', blurb: 'For the sweet tooth' },
+]
 
 function Hero() {
   return (
-    <section className="border-b rule overflow-hidden">
-      <div className="mx-auto max-w-[1180px] px-5 sm:px-8 py-14 lg:py-24
-                      grid lg:grid-cols-[1.02fr_0.98fr] gap-12 lg:gap-20 items-center">
+    <section className="container-page pt-5">
+      <div className="rounded-[var(--radius-panel)] bg-pista px-6 py-12 sm:px-12 lg:px-16 lg:py-16
+                      grid lg:grid-cols-[1.08fr_0.92fr] gap-12 items-center">
         <div className="text-center lg:text-left">
-          <h1 className="font-display text-[clamp(2.9rem,6.4vw,4.9rem)] leading-[0.98] tracking-[-0.022em]">
+          <h1 className="font-display font-normal text-[clamp(3rem,6.4vw,5.25rem)] leading-[0.96] tracking-[-0.025em]">
             {BRAND.tagline}
           </h1>
-
-          <p className="text-ink-60 text-lg leading-relaxed mt-6 max-w-[46ch] mx-auto lg:mx-0">
+          <p className="text-muted text-lg sm:text-xl leading-relaxed mt-6 max-w-[42ch] mx-auto lg:mx-0">
             {BRAND.heroLead}
           </p>
 
           <div className="mt-9 flex flex-wrap gap-3 justify-center lg:justify-start">
-            <Link
-              to="/products"
-              className="bg-brand text-white px-8 py-4 font-medium hover:bg-brand-deep transition-colors"
-            >
-              Shop the range
-            </Link>
-            <Link
-              to="/gifting"
-              className="border border-espresso/25 px-8 py-4 font-medium hover:border-espresso hover:bg-almond/60 transition-colors"
-            >
-              Diwali gift boxes
-            </Link>
+            <Link to="/products" className="button-primary text-[1.05rem]">Shop the range</Link>
+            <Link to="/gifting" className="button-quiet text-[1.05rem] bg-paper/60">Diwali gift boxes</Link>
           </div>
 
-          <dl className="mt-10 pt-6 border-t rule flex flex-wrap justify-center lg:justify-start
-                         gap-x-9 gap-y-3 text-sm">
+          <dl className="mt-11 flex flex-wrap justify-center lg:justify-start gap-x-10 gap-y-4 text-[0.95rem]">
             <div>
-              <dt className="text-ink-40">Licensed food business</dt>
-              <dd className="text-leaf tabular-nums mt-0.5">FSSAI {BRAND.fssai}</dd>
+              <dt className="text-faint">Licensed food business</dt>
+              <dd className="tabular-nums">FSSAI {BRAND.fssai}</dd>
             </div>
             <div>
-              <dt className="text-ink-40">Packed in</dt>
-              <dd className="mt-0.5">{BRAND.city}, {BRAND.state}</dd>
+              <dt className="text-faint">Packed by hand in</dt>
+              <dd>{BRAND.city}</dd>
             </div>
             <div>
-              <dt className="text-ink-40">Delivery</dt>
-              <dd className="mt-0.5">Free over {formatINR(BRAND.delivery.freeAbove)}</dd>
+              <dt className="text-faint">Delivery</dt>
+              <dd>Free above {formatINR(BRAND.delivery.freeAbove)}</dd>
             </div>
           </dl>
         </div>
 
-        <div className="relative mx-auto w-full max-w-[560px]">
-          <div className="absolute -inset-3 bg-almond -z-10" aria-hidden="true" />
+        {/* The thaal: overhead bowls, cropped round, the way dry fruits are offered at Diwali */}
+        <div className="relative mx-auto w-full max-w-[29rem] aspect-square">
+          <div className="absolute inset-0 rounded-full border border-olive/20 scale-[1.06]" aria-hidden="true" />
           <img
             src="/hero-dry-fruits.png"
-            alt="Bowls of almonds, cashews, pistachios, walnuts, raisins, dates and figs"
-            width="640"
-            height="640"
-            className="w-full aspect-square object-cover"
+            alt="A round platter of almonds, cashews, pistachios, walnuts, raisins, dates and figs"
+            width="640" height="640"
+            className="relative w-full h-full rounded-full object-cover"
           />
         </div>
       </div>
@@ -67,128 +60,124 @@ function Hero() {
   )
 }
 
-function GoodRow({ product }) {
+function SectionHead({ title, children, action }) {
   return (
-    <Link
-      to={`/products/${product.id}`}
-      className="group grid grid-cols-[64px_1fr_auto] sm:grid-cols-[72px_1fr_auto] gap-4 sm:gap-6 items-center py-5 border-b rule hover:bg-almond/60 transition-colors px-2 -mx-2"
-    >
-      <div className="w-16 h-16 bg-white border rule flex items-center justify-center p-1.5">
-        <img
-          src={product.images[0]}
-          alt=""
-          loading="lazy"
-          className="max-w-full max-h-full object-contain"
-          onError={(e) => { e.target.onerror = null; e.target.src = '/images/placeholder.svg' }}
-        />
+    <div className="flex flex-wrap items-end justify-between gap-4 mb-7">
+      <div>
+        <h2 className="font-display font-normal text-[clamp(2rem,3.6vw,2.75rem)] leading-tight tracking-[-0.015em]">{title}</h2>
+        {children && <p className="text-muted mt-1.5 max-w-[56ch]">{children}</p>}
       </div>
-
-      <div className="min-w-0">
-        <h3 className="font-display text-xl sm:text-2xl leading-tight">{product.name}</h3>
-        <p className="font-display italic text-ink-40 text-base">{glossFor(product)}</p>
-        <dl className="flex flex-wrap gap-x-5 gap-y-1 text-sm mt-2">
-          {product.weights.map(w => (
-            <div key={w.size} className="flex gap-1.5">
-              <dt className="text-ink-40">{w.size}</dt>
-              <dd className="text-ink-60 tabular-nums">{formatINR(w.price)}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-
-      <div className="text-right shrink-0">
-        <span className="block text-ink-40 text-sm">from</span>
-        <span className="block text-lg tabular-nums group-hover:text-brand transition-colors">
-          {formatINR(lowestPrice(product))}
-        </span>
-      </div>
-    </Link>
+      {action}
+    </div>
   )
 }
 
 export default function Home() {
   const { products, loading } = useProducts()
 
-  if (loading || !products.length) {
-    return (
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-24">
-        <p className="text-ink-40">Loading the day's rates…</p>
-      </div>
-    )
+  if (loading) {
+    return <div className="container-page py-32 text-center text-muted">Weighing out today's goods…</div>
   }
+
+  const picks = products.filter(p => p.featured).slice(0, 4)
+  const kinds = KINDS
+    .map(k => {
+      const goods = products.filter(p => p.category === k.name)
+      return { ...k, count: goods.length, cover: (goods.find(g => g.featured) || goods[0])?.images[0] }
+    })
+    .filter(k => k.count > 0)
 
   return (
     <>
       <Hero />
 
-      {/* Rate list — the native document of this trade */}
-      <section className="mx-auto max-w-6xl px-4 sm:px-6 py-14 sm:py-20">
-        <div className="flex items-baseline justify-between border-b-2 border-espresso pb-3 mb-2">
-          <h2 className="font-display text-3xl sm:text-4xl">Everything we stock</h2>
-          <span className="text-ink-40 text-sm tabular-nums">{products.length} goods</span>
+      <section className="container-page mt-20 sm:mt-24">
+        <SectionHead title="What we stock">
+          {products.length} goods across {kinds.length} kinds, each in 250 g, 500 g and 1 kg packs.
+        </SectionHead>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          {kinds.map(k => (
+            <Link key={k.name} to={`/products?category=${encodeURIComponent(k.name)}`}
+              className="group rounded-[var(--radius-panel)] bg-well p-5 sm:p-6 flex flex-col hover:bg-well-deep transition-colors">
+              <div className="aspect-[4/3] grid place-items-center">
+                {k.cover && (
+                  <img src={k.cover} alt="" loading="lazy"
+                    className="photo-blend max-h-full max-w-[80%] object-contain transition-transform duration-500 group-hover:scale-[1.04]" />
+                )}
+              </div>
+              <h3 className="font-display text-[1.45rem] leading-tight mt-4">{k.name}</h3>
+              <p className="text-muted text-[0.95rem] mt-0.5">{k.blurb}</p>
+              <p className="text-faint text-[0.9rem] mt-3">{k.count} {k.count === 1 ? 'good' : 'goods'}</p>
+            </Link>
+          ))}
         </div>
-
-        <div>
-          {products.map(p => <GoodRow key={p.id} product={p} />)}
-        </div>
-
-        <p className="text-ink-40 text-sm mt-6">
-          Rates include packing. Free delivery above {formatINR(BRAND.delivery.freeAbove)}.
-        </p>
       </section>
 
-      {/* Gifting — the only place maroon appears */}
-      <section className="bg-red-deep text-linen">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-20 grid md:grid-cols-[1.2fr_1fr] gap-10 items-center">
+      <section className="container-page mt-20 sm:mt-24">
+        <SectionHead
+          title="Start with these"
+          action={<Link to="/products" className="button-quiet !py-2.5">See all {products.length}</Link>}
+        >
+          The goods most families reach for first.
+        </SectionHead>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-9 sm:gap-x-6">
+          {picks.map(p => <ProductCard key={p.id} product={p} />)}
+        </div>
+      </section>
+
+      {/* Diwali — the one place crimson appears in a heading */}
+      <section className="container-page mt-20 sm:mt-24">
+        <div className="rounded-[var(--radius-panel)] bg-blush px-6 py-12 sm:px-12 lg:px-16 lg:py-16
+                        grid lg:grid-cols-2 gap-10 items-center">
           <div>
-            <h2 className="font-display text-4xl sm:text-5xl leading-[1.05]">
-              Boxes for Diwali
+            <h2 className="font-display font-normal text-crimson-deep text-[clamp(2.3rem,4.4vw,3.4rem)] leading-[1.02] tracking-[-0.02em]">
+              Diwali boxes, packed by hand
             </h2>
-            <p className="text-linen/80 leading-relaxed max-w-[50ch] mt-4">
-              Choose the goods, the weights and the box. We pack it, seal it and send it
-              with your note inside — one for the family, or two hundred for an office.
+            <p className="text-muted text-lg leading-relaxed mt-5 max-w-[46ch]">
+              Choose the goods and the weights. We pack them into a gift box, seal it,
+              and send it with your note inside.
             </p>
-            <Link
-              to="/gifting"
-              className="inline-block mt-7 bg-linen text-red-deep px-7 py-3.5 font-medium hover:bg-almond transition-colors"
-            >
-              Build a box
+            <Link to="/gifting" className="button-primary mt-8 text-[1.05rem] !bg-crimson-deep hover:!bg-crimson">
+              Plan a gift box
             </Link>
           </div>
-          <p className="font-display italic text-2xl text-linen/60 leading-relaxed">
-            For offices ordering in bulk, tell us your budget per box and we will
-            put the combinations together.
-          </p>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="rounded-[var(--radius-panel)] bg-paper/70 p-6">
+              <h3 className="font-display text-xl">For the family</h3>
+              <p className="text-muted mt-2 leading-relaxed">One box or a few, for the people you visit this Diwali.</p>
+            </div>
+            <div className="rounded-[var(--radius-panel)] bg-paper/70 p-6">
+              <h3 className="font-display text-xl">For the office</h3>
+              <p className="text-muted mt-2 leading-relaxed">Ten or more boxes. Give us a budget per box and we will send options.</p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* The house behind the goods */}
-      <section className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-24 grid md:grid-cols-[1fr_1.1fr] gap-10 md:gap-16">
+      <section className="container-page mt-20 sm:mt-24 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+        <img src="/why-choose-us.png" alt="Bowls of dry fruits on a kitchen counter by a window"
+          width="640" height="640" loading="lazy"
+          className="w-full aspect-square object-cover rounded-[var(--radius-panel)]" />
         <div>
-          <h2 className="font-display text-4xl sm:text-5xl leading-[1.05]">
+          <h2 className="font-display font-normal text-[clamp(2rem,3.6vw,2.75rem)] leading-tight tracking-[-0.015em]">
             {BRAND.story.heading}
           </h2>
-        </div>
-        <div className="space-y-5 text-ink-60 leading-relaxed max-w-[62ch]">
-          {BRAND.story.body.map((para, i) => (
-            <p key={i} className={i === 0 ? 'text-espresso text-lg' : undefined}>{para}</p>
-          ))}
-          <Link to="/story" className="inline-block text-espresso underline underline-offset-4">
-            More about the family
-          </Link>
+          <div className="mt-6 space-y-4 text-muted text-lg leading-relaxed max-w-[54ch]">
+            {BRAND.story.body.map((para, i) => (
+              <p key={i} className={i === 0 ? 'text-ink' : undefined}>{para}</p>
+            ))}
+          </div>
+          <Link to="/story" className="button-quiet mt-7">Read our story</Link>
         </div>
       </section>
 
-      {/* Three checkable claims */}
-      <section className="border-t rule">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-14 grid sm:grid-cols-3">
-          {BRAND.assurances.map((a, i) => (
-            <div key={a.title} className={`py-5 sm:py-0 sm:px-8 ${i === 0 ? 'sm:pl-0' : ''} ${i < 2 ? 'border-b sm:border-b-0 sm:border-r rule' : 'sm:pr-0'}`}>
-              <h3 className="font-display text-xl">{a.title}</h3>
-              <p className="text-ink-60 text-[0.95rem] leading-relaxed mt-2">{a.body}</p>
-            </div>
-          ))}
-        </div>
+      <section className="container-page mt-20 sm:mt-24 grid sm:grid-cols-3 gap-4 sm:gap-5">
+        {BRAND.assurances.map(a => (
+          <div key={a.title} className="rounded-[var(--radius-panel)] bg-well p-7">
+            <h3 className="font-display text-[1.3rem]">{a.title}</h3>
+            <p className="text-muted mt-2 leading-relaxed">{a.body}</p>
+          </div>
+        ))}
       </section>
     </>
   )

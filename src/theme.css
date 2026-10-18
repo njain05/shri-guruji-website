@@ -1,51 +1,79 @@
-/* Layer order decides priority, lowest first. The old stylesheet is pulled in
-   as `legacy` so pages not yet redesigned keep working, while anything written
-   in Tailwind utilities reliably wins over it. Unlayered CSS would outrank
-   Tailwind entirely, which is why index.css is imported into a layer. */
-@layer legacy, theme, base, components, utilities;
+/* Layer order decides priority, lowest first.
+   - legacy: the old index.css, kept so the admin pages render as before.
+   - Tailwind's preflight is deliberately NOT imported. It lives in `base`,
+     which outranks `legacy`, so its `* { margin: 0; padding: 0 }` wiped the
+     old .container margins and jammed pages against the left edge.
+     index.css already ships its own reset, so preflight was redundant. */
+@layer reset, legacy, theme, base, components, utilities;
 
-@import "tailwindcss";
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
 @import "./index.css" layer(legacy);
 
+/* Below `legacy`, so the admin pages' own button colours still win.
+   index.css strips button borders but never the background, which let the
+   browser's grey button face show through on every plain button. */
+@layer reset {
+  button { background-color: transparent; color: inherit; }
+  fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+  legend { padding: 0; }
+  ul, ol { list-style: none; }
+}
+
+
 /* ---------------------------------------------------------------
-   Shri Guru Ji — design tokens
-   Four working colours. Maroon is reserved for gifting and appears
-   exactly once on the page, so it still reads as an occasion.
+   Shri Guru Ji — design tokens ("Pistachio")
+   Every colour on the site is defined here and nowhere else, so the
+   palette can be swapped by editing this block alone. Names avoid every
+   variable index.css defines, so nothing here restyles the admin pages.
    --------------------------------------------------------------- */
 @theme {
-  --color-linen:    #FAF6F0;
-  --color-almond:   #F2EAE0;
-  --color-almond-2: #E7DACB;
-  --color-espresso: #1C1917;
-  --color-ink-60:   #57504A;
-  --color-ink-40:   #8A8077;
-  /* Sampled from the packaging label so the site matches what arrives
-     in the customer's hands. Brown is the action colour, red is reserved
-     for gifting and festival, green only ever appears as a small mark —
-     it is vivid, and a little of it goes a long way on linen. */
-  --color-brand:       #7F380C;
-  --color-brand-deep:  #5E2908;
-  --color-red:         #BF1925;
-  --color-red-deep:    #8E1019;
-  --color-leaf:        #06701A;
+  --color-paper:        #FFFFFF;
+  --color-pista:        #EDF2E4;   /* feature panels — from the logo's green band, softened */
+  --color-pista-deep:   #DCE6CE;
+  --color-well:         #F3F1EA;   /* behind product photos: warm neutral, so goods aren't tinted green */
+  --color-well-deep:    #E8E4D8;
+  --color-ink:          #23281F;
+  --color-muted:        #5C6356;
+  --color-faint:        #8F9587;
+  --color-olive:        #3F5E3A;   /* every primary action */
+  --color-olive-deep:   #2E4729;
+  --color-blush:        #F8E4DF;   /* Diwali */
+  --color-crimson:      #BF1925;   /* the label's red — Diwali and saved items only */
+  --color-crimson-deep: #8F121B;
 
-  /* kept so any not-yet-redesigned markup still resolves */
-  --color-marigold: #7F380C;
-  --color-marigold-deep: #5E2908;
-  --color-maroon:   #8E1019;
+  --font-display: "Fraunces", Georgia, serif;
+  --font-sans:    "Mukta", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Fraunces", Georgia, serif;   /* index.css headings follow */
+  --font-body:    "Mukta", ui-sans-serif, system-ui, sans-serif;
 
-  --font-display: "Playfair Display", Georgia, serif;
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-
-  /* Display sizes are set in rem against a 16px root, following a
-     roughly 1.333 (perfect fourth) scale. */
-  --text-good: clamp(2.75rem, 7vw, 5.25rem);
-  --text-good--line-height: 0.92;
+  /* Restrained corners: soft enough not to feel sharp, never bubbly. */
+  --radius-panel: 10px;
+  --radius-media: 8px;
+  --radius-field: 6px;
 }
 
 @layer base {
-  html {
-    scroll-behavior: smooth;
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 { color: inherit; }
+
+  h1, h2, h3, h4, .font-display {
+    font-variation-settings: "SOFT" 100, "WONK" 0;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-olive);
+    outline-offset: 3px;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -56,30 +84,48 @@
       transition-duration: 0.01ms !important;
     }
   }
-
-  body {
-    background-color: var(--color-linen);
-    color: var(--color-espresso);
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* The legacy stylesheet sets an explicit colour on headings, which beats
-     inherited colour and turns them dark on a dark section. Headings should
-     take the colour of whatever they sit on. */
-  h1, h2, h3, h4, h5, h6 {
-    color: inherit;
-    font-weight: inherit;
-  }
-
-  /* Keyboard focus must stay visible everywhere. */
-  :focus-visible {
-    outline: 2px solid var(--color-marigold);
-    outline-offset: 3px;
-    border-radius: 2px;
-  }
 }
 
-@utility rule {
-  border-color: color-mix(in oklab, var(--color-espresso) 14%, transparent);
+/* Product photos are studio shots on white. Multiplied onto the well, the
+   white takes the well's colour and the pouch keeps its own. */
+@utility photo-blend { mix-blend-mode: multiply; }
+
+@utility hairline {
+  border-color: color-mix(in oklab, var(--color-ink) 12%, transparent);
+}
+
+@utility container-page {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 76rem;
+  padding-inline: 1.25rem;
+  @media (width >= 40rem) { padding-inline: 2rem; }
+}
+
+/* Shared control styles, so every button on the site is the same object. */
+@utility button-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  border-radius: var(--radius-field);
+  background: var(--color-olive); color: var(--color-paper);
+  padding: .8rem 1.6rem; font-weight: 500;
+  transition: background-color .15s;
+  &:hover { background: var(--color-olive-deep); }
+  &:disabled { background: var(--color-well-deep); color: var(--color-faint); cursor: not-allowed; }
+}
+@utility button-quiet {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  border-radius: var(--radius-field);
+  border: 1px solid color-mix(in oklab, var(--color-ink) 18%, transparent);
+  color: var(--color-ink); padding: .8rem 1.6rem;
+  transition: background-color .15s, border-color .15s;
+  &:hover { background: var(--color-well); border-color: color-mix(in oklab, var(--color-ink) 30%, transparent); }
+}
+@utility field {
+  width: 100%;
+  border-radius: var(--radius-field);
+  border: 1px solid color-mix(in oklab, var(--color-ink) 16%, transparent);
+  background: var(--color-paper);
+  padding: .7rem .9rem;
+  font: inherit; color: var(--color-ink);
+  &:focus { outline: none; border-color: var(--color-olive); box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-olive) 18%, transparent); }
 }
