@@ -8,7 +8,7 @@ import { CartProvider } from './context/CartContext.jsx'
 import { OrderProvider } from './context/OrderContext.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { WishlistProvider } from './context/WishlistContext.jsx'
-import './index.css'
+import './theme.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

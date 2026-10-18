@@ -1,72 +1,77 @@
 import { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { FiShoppingCart, FiMenu, FiX, FiHeart } from 'react-icons/fi'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
-import { useWishlist } from '../context/WishlistContext'
-import './Navbar.css'
+import { BRAND } from '../data/brand'
+
+const LINKS = [
+  { to: '/products', label: 'Shop' },
+  { to: '/gifting', label: 'Gifting' },
+  { to: '/story', label: 'Our story' },
+]
 
 export default function Navbar() {
   const { getCartCount } = useCart()
-  const { wishlist } = useWishlist()
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [isMobileOpen, setIsMobileOpen] = useState(false)
+  const [open, setOpen] = useState(false)
   const location = useLocation()
-  const cartCount = getCartCount()
-  const wishlistCount = wishlist.length
+  const count = getCartCount()
 
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  useEffect(() => {
-    setIsMobileOpen(false)
-  }, [location])
-
-  const isAdmin = location.pathname.startsWith('/admin')
+  useEffect(() => { setOpen(false) }, [location])
 
   return (
-    <nav className={`navbar ${isScrolled ? 'navbar--scrolled' : ''} ${isAdmin ? 'navbar--admin' : ''}`}>
-      <div className="navbar__inner container">
-        <Link to="/" className="navbar__brand">
-          <img src="/images/logo.jpeg" alt="Shri Guru Ji Logo" className="navbar__logo-img" />
-          <div className="navbar__brand-text">
-            <span className="navbar__brand-name">Shri Guru Ji</span>
-            <span className="navbar__brand-tag">Dry Fruits</span>
-          </div>
-        </Link>
-
-        <div className={`navbar__links ${isMobileOpen ? 'navbar__links--open' : ''}`}>
-          <Link to="/" className={`navbar__link ${location.pathname === '/' ? 'navbar__link--active' : ''}`}>Home</Link>
-          <Link to="/products" className={`navbar__link ${location.pathname === '/products' ? 'navbar__link--active' : ''}`}>Products</Link>
-          <Link to="/cart" className={`navbar__link ${location.pathname === '/cart' ? 'navbar__link--active' : ''}`}>Cart</Link>
-        </div>
-
-        <div className="navbar__actions">
-          <Link to="/wishlist" className="navbar__icon-btn" aria-label="Wishlist" title="Saved Items">
-            <FiHeart size={20} />
-            {wishlistCount > 0 && (
-              <span className="navbar__icon-badge">{wishlistCount}</span>
-            )}
+    <header className="sticky top-0 z-50 bg-linen/95 backdrop-blur-sm border-b rule">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="flex items-baseline justify-between gap-6 py-4">
+          <Link to="/" className="shrink-0 leading-none">
+            <span className="block font-display text-2xl sm:text-[1.6rem] tracking-tight">
+              {BRAND.name}
+            </span>
+            <span className="block font-display italic text-ink-40 text-sm -mt-0.5">
+              {BRAND.trade}
+            </span>
           </Link>
 
-          <Link to="/cart" className="navbar__cart-btn" id="cart-button">
-            <FiShoppingCart size={22} />
-            {cartCount > 0 && (
-              <span className="navbar__cart-badge">{cartCount}</span>
-            )}
-          </Link>
+          <nav className="hidden md:flex items-baseline gap-8 text-[0.95rem]">
+            {LINKS.map(l => (
+              <NavLink
+                key={l.to}
+                to={l.to}
+                className={({ isActive }) =>
+                  `pb-0.5 border-b transition-colors ${
+                    isActive
+                      ? 'border-marigold text-espresso'
+                      : 'border-transparent text-ink-60 hover:text-espresso'
+                  }`
+                }
+              >
+                {l.label}
+              </NavLink>
+            ))}
+            <Link to="/cart" className="text-ink-60 hover:text-espresso">
+              Basket{count > 0 && <span className="text-espresso"> ({count})</span>}
+            </Link>
+          </nav>
 
           <button
-            className="navbar__mobile-toggle"
-            onClick={() => setIsMobileOpen(!isMobileOpen)}
-            aria-label="Toggle menu"
+            className="md:hidden text-[0.95rem] text-ink-60"
+            onClick={() => setOpen(v => !v)}
+            aria-expanded={open}
+            aria-controls="nav-menu"
           >
-            {isMobileOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+            {open ? 'Close' : `Menu${count > 0 ? ` (${count})` : ''}`}
           </button>
         </div>
+
+        {open && (
+          <nav id="nav-menu" className="md:hidden pb-4 flex flex-col gap-3 text-lg">
+            {LINKS.map(l => (
+              <Link key={l.to} to={l.to} className="text-ink-60">{l.label}</Link>
+            ))}
+            <Link to="/cart" className="text-ink-60">
+              Basket{count > 0 && ` (${count})`}
+            </Link>
+          </nav>
+        )}
       </div>
-    </nav>
+    </header>
   )
 }

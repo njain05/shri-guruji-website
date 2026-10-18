@@ -12,6 +12,8 @@ import Cart from './pages/customer/Cart'
 import Checkout from './pages/customer/Checkout'
 import OrderConfirmation from './pages/customer/OrderConfirmation'
 import Wishlist from './pages/customer/Wishlist'
+import Story from './pages/customer/Story'
+import Gifting from './pages/customer/Gifting'
 
 // Admin pages
 import AdminLogin from './pages/admin/AdminLogin'
@@ -47,6 +49,8 @@ export default function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
           <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/story" element={<Story />} />
+          <Route path="/gifting" element={<Gifting />} />
 
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLogin />} />
