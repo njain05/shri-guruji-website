@@ -45,11 +45,9 @@
 }
 
 .navbar__logo-img {
-  width: 42px;
-  height: 42px;
-  border-radius: var(--radius-full);
-  object-fit: cover;
-  border: 1.5px solid var(--color-gold);
+  height: 50px;
+  width: auto;
+  display: block;
 }
 
 .navbar__brand-text {

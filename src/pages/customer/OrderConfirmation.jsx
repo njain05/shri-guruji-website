@@ -34,8 +34,8 @@ export default function OrderConfirmation() {
             <div className="confirmation-section">
               <h3><FiPackage size={18} /> Order Details</h3>
               <div className="confirmation-items">
-                {order.items.map(item => (
-                  <div key={item.id} className="confirmation-item">
+                {order.items.map((item, i) => (
+                  <div key={`${item.id}-${item.weight}-${i}`} className="confirmation-item">
                     <div className="confirmation-item__info">
                       <span className="confirmation-item__name">{item.name}</span>
                       <span className="confirmation-item__meta">{item.weight} × {item.quantity}</span>

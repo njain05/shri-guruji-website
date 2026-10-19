@@ -12,6 +12,7 @@ import Cart from './pages/customer/Cart'
 import Checkout from './pages/customer/Checkout'
 import OrderConfirmation from './pages/customer/OrderConfirmation'
 import Wishlist from './pages/customer/Wishlist'
+import NotFound from './pages/customer/NotFound'
 
 // Admin pages
 import AdminLogin from './pages/admin/AdminLogin'
@@ -22,7 +23,7 @@ import OrderManager from './pages/admin/OrderManager'
 function ScrollToTop() {
   const { pathname } = useLocation()
   useEffect(() => {
-    window.scrollTo(0, 0)
+    window.scrollTo({ top: 0, behavior: 'instant' })
   }, [pathname])
   return null
 }
@@ -53,6 +54,8 @@ export default function App() {
           <Route path="/admin/dashboard" element={<Dashboard />} />
           <Route path="/admin/products" element={<ProductManager />} />
           <Route path="/admin/orders" element={<OrderManager />} />
+
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
 

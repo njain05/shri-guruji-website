@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
-import { FiTruck, FiShield, FiStar, FiArrowRight, FiHeart, FiAward, FiPackage, FiCheckCircle, FiRefreshCw, FiMessageCircle } from 'react-icons/fi'
+import { FiAward, FiHome, FiPackage, FiMessageCircle } from 'react-icons/fi'
 import { useProducts } from '../../context/ProductContext'
 import ProductCard from '../../components/ProductCard'
+import { BRAND, formatINR } from '../../data/brand'
 import './Home.css'
 
 export default function Home() {
@@ -19,39 +20,34 @@ export default function Home() {
         <div className="hero__bg-pattern"></div>
         <div className="container hero__inner">
           <div className="hero__content animate-fade-in-up">
-            <span className="hero__badge badge badge-gold">
-              <FiAward size={14} /> Premium Quality Since Generations
-            </span>
-            <h1 className="hero__title">
-              Premium <span className="hero__title-accent">Dry Fruits</span>
-              <br />Delivered Fresh
-            </h1>
+            <p className="hero__eyebrow">From a {BRAND.city} wholesale family</p>
+            <h1 className="hero__title">Premium dry fruits, delivered fresh</h1>
             <p className="hero__subtitle">
-              Handpicked, farm-fresh dry fruits & seeds from the finest orchards.
-              Experience the authentic taste of nature with Shri Guru Ji.
+              Badam, kaju, pista, anjeer and more — the same grades we sell to shops
+              in {BRAND.city}, now weighed and packed at home for you.
             </p>
             <div className="hero__actions">
               <Link to="/products" className="btn btn-primary btn-lg">
-                Shop Now <FiArrowRight size={20} />
+                Shop now
               </Link>
               <button onClick={scrollToFeatured} className="btn btn-secondary btn-lg">
-                See Bestsellers
+                See our picks
               </button>
             </div>
             <div className="hero__stats">
               <div className="hero__stat">
-                <span className="hero__stat-number">16+</span>
-                <span className="hero__stat-label">Products</span>
+                <span className="hero__stat-number">{loading ? '—' : products.length}</span>
+                <span className="hero__stat-label">goods in stock</span>
               </div>
               <div className="hero__stat-divider"></div>
               <div className="hero__stat">
-                <span className="hero__stat-number">100%</span>
-                <span className="hero__stat-label">Natural</span>
+                <span className="hero__stat-number">FSSAI</span>
+                <span className="hero__stat-label">licensed food business</span>
               </div>
               <div className="hero__stat-divider"></div>
               <div className="hero__stat">
-                <span className="hero__stat-number">Pan</span>
-                <span className="hero__stat-label">India Delivery</span>
+                <span className="hero__stat-number">{formatINR(BRAND.delivery.freeAbove)}</span>
+                <span className="hero__stat-label">and up ships free</span>
               </div>
             </div>
           </div>
@@ -59,13 +55,10 @@ export default function Home() {
             <div className="hero__image-circle">
               <img
                 src="/hero-dry-fruits.png"
-                alt="Premium dry fruits assortment"
+                alt="Bowls of almonds, cashews, pistachios, walnuts, raisins, dates and figs"
                 className="hero__img"
               />
             </div>
-            <div className="hero__float hero__float--1">🌰</div>
-            <div className="hero__float hero__float--2">🥜</div>
-            <div className="hero__float hero__float--3">🫐</div>
           </div>
         </div>
       </section>
@@ -75,32 +68,24 @@ export default function Home() {
         <div className="container">
           <div className="features__grid">
             <div className="feature-card">
-              <div className="feature-card__icon">
-                <FiShield size={28} />
-              </div>
-              <h3 className="feature-card__title">100% Natural</h3>
-              <p className="feature-card__desc">No preservatives, no artificial colors. Pure, natural goodness in every bite.</p>
+              <div className="feature-card__icon"><FiAward size={28} /></div>
+              <h3 className="feature-card__title">FSSAI licensed</h3>
+              <p className="feature-card__desc">A registered food business. Licence {BRAND.fssai} is printed on every pouch.</p>
             </div>
             <div className="feature-card">
-              <div className="feature-card__icon">
-                <FiTruck size={28} />
-              </div>
-              <h3 className="feature-card__title">Fast Delivery</h3>
-              <p className="feature-card__desc">Quick and reliable delivery across India. Fresh from our store to your door.</p>
+              <div className="feature-card__icon"><FiPackage size={28} /></div>
+              <h3 className="feature-card__title">Wholesale grades</h3>
+              <p className="feature-card__desc">The same goods and grades we supply to shops, not a separate retail line.</p>
             </div>
             <div className="feature-card">
-              <div className="feature-card__icon">
-                <FiStar size={28} />
-              </div>
-              <h3 className="feature-card__title">Premium Quality</h3>
-              <p className="feature-card__desc">Handpicked from the finest farms. Every product passes strict quality checks.</p>
+              <div className="feature-card__icon"><FiHome size={28} /></div>
+              <h3 className="feature-card__title">Packed at home</h3>
+              <p className="feature-card__desc">Every order is weighed and packed by our family in {BRAND.city}.</p>
             </div>
             <div className="feature-card">
-              <div className="feature-card__icon">
-                <FiHeart size={28} />
-              </div>
-              <h3 className="feature-card__title">Health First</h3>
-              <p className="feature-card__desc">Nutrient-rich superfoods that boost your immunity and overall wellness.</p>
+              <div className="feature-card__icon"><FiMessageCircle size={28} /></div>
+              <h3 className="feature-card__title">Confirmed on WhatsApp</h3>
+              <p className="feature-card__desc">We message you to confirm every order, and again when it is on its way.</p>
             </div>
           </div>
         </div>
@@ -109,10 +94,9 @@ export default function Home() {
       {/* Featured Products */}
       <section className="featured-products section" id="featured-products">
         <div className="container">
-          <h2 className="section-title">Our Bestsellers</h2>
-          <div className="section-divider"></div>
+          <h2 className="section-title">Our picks</h2>
           <p className="section-subtitle">
-            Discover our most loved products, handpicked for their exceptional quality and taste
+            A good place to start. Every good comes in 250 g, 500 g and 1 kg packs.
           </p>
 
           {loading ? (
@@ -135,7 +119,7 @@ export default function Home() {
 
           <div className="featured-products__cta">
             <Link to="/products" className="btn btn-gold btn-lg">
-              View All Products <FiArrowRight size={20} />
+              See all {loading ? '' : products.length} goods
             </Link>
           </div>
         </div>
@@ -146,84 +130,22 @@ export default function Home() {
         <div className="container">
           <div className="why-us__inner">
             <div className="why-us__content">
-              <h2 className="why-us__title">Why Choose<br /><span className="text-gold">Shri Guru Ji?</span></h2>
-              <div className="section-divider" style={{ margin: '1rem 0 1.5rem' }}></div>
+              <h2 className="why-us__title">The same goods we sell to shops</h2>
               <p className="why-us__desc">
-                For generations, the Shri Guru Ji family has been dedicated to sourcing and delivering
-                the finest dry fruits and seeds. Our commitment to quality, freshness, and customer
-                satisfaction sets us apart.
+                Our family supplies dry fruits wholesale in {BRAND.city}. Shopkeepers buy their
+                badam, kaju and anjeer from us in bulk.
               </p>
-              <ul className="why-us__list">
-                <li className="why-us__list-item">
-                  <FiPackage className="why-us__list-icon" />
-                  <div>
-                    <strong>Direct from Farms</strong>
-                    <p>We source directly from trusted farmers, cutting out middlemen for the freshest products.</p>
-                  </div>
-                </li>
-                <li className="why-us__list-item">
-                  <FiShield className="why-us__list-icon" />
-                  <div>
-                    <strong>Quality Guaranteed</strong>
-                    <p>Every batch is quality tested. We stand behind the purity and freshness of our products.</p>
-                  </div>
-                </li>
-                <li className="why-us__list-item">
-                  <FiTruck className="why-us__list-icon" />
-                  <div>
-                    <strong>Safe & Secure Packaging</strong>
-                    <p>Vacuum-sealed packaging ensures your dry fruits reach you in perfect condition.</p>
-                  </div>
-                </li>
-              </ul>
+              <p className="why-us__desc">
+                This shop is run by my mother. She was a teacher until recently, and left to start
+                this from home — the same sourcing and the same grades, packed by hand and sent
+                straight to you.
+              </p>
             </div>
             <div className="why-us__image">
               <img
                 src="/why-choose-us.png"
-                alt="Various dry fruits in wooden bowls"
+                alt="Bowls of dry fruits on a kitchen counter by a window"
               />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Trust Signals */}
-      <section className="trust-section section">
-        <div className="container">
-          <h2 className="section-title">Why Customers Trust Us</h2>
-          <div className="section-divider"></div>
-          <p className="section-subtitle">Our promises to every customer, every order</p>
-
-          <div className="trust-grid">
-            <div className="trust-card">
-              <div className="trust-card__icon">🌿</div>
-              <h4 className="trust-card__title">100% Natural</h4>
-              <p className="trust-card__desc">No preservatives, no artificial colors or flavors — ever.</p>
-            </div>
-            <div className="trust-card">
-              <div className="trust-card__icon">🏛️</div>
-              <h4 className="trust-card__title">FSSAI Registered</h4>
-              <p className="trust-card__desc">Licensed & certified food store meeting all safety standards.</p>
-            </div>
-            <div className="trust-card">
-              <div className="trust-card__icon">📦</div>
-              <h4 className="trust-card__title">Vacuum Sealed</h4>
-              <p className="trust-card__desc">Airtight packaging keeps products fresh from store to doorstep.</p>
-            </div>
-            <div className="trust-card">
-              <div className="trust-card__icon">↩️</div>
-              <h4 className="trust-card__title">Easy Returns</h4>
-              <p className="trust-card__desc">Not happy? We offer hassle-free returns within 3 days.</p>
-            </div>
-            <div className="trust-card">
-              <div className="trust-card__icon">💬</div>
-              <h4 className="trust-card__title">WhatsApp Support</h4>
-              <p className="trust-card__desc">Dedicated WhatsApp support for queries, orders, and tracking.</p>
-            </div>
-            <div className="trust-card">
-              <div className="trust-card__icon">🚚</div>
-              <h4 className="trust-card__title">Pan India Delivery</h4>
-              <p className="trust-card__desc">We ship to every corner of India. Free delivery above ₹500.</p>
             </div>
           </div>
         </div>
@@ -233,13 +155,13 @@ export default function Home() {
       <section className="cta-banner">
         <div className="container">
           <div className="cta-banner__inner">
-            <h2 className="cta-banner__title">Ready to Order Fresh Dry Fruits?</h2>
+            <h2 className="cta-banner__title">Order for home, or for Diwali</h2>
             <p className="cta-banner__desc">
-              Browse our collection and get premium dry fruits delivered to your doorstep.
-              Safe payments via Google Pay, PhonePe, or Cash on Delivery.
+              Pay cash on delivery. Free delivery on orders above {formatINR(BRAND.delivery.freeAbove)}.
+              Want it packed as a gift? Tick the gift box option at checkout.
             </p>
             <Link to="/products" className="btn btn-gold btn-lg">
-              Order Now <FiArrowRight size={20} />
+              Shop now
             </Link>
           </div>
         </div>

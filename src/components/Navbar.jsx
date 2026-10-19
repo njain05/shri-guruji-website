@@ -30,11 +30,7 @@ export default function Navbar() {
     <nav className={`navbar ${isScrolled ? 'navbar--scrolled' : ''} ${isAdmin ? 'navbar--admin' : ''}`}>
       <div className="navbar__inner container">
         <Link to="/" className="navbar__brand">
-          <img src="/images/logo.jpeg" alt="Shri Guru Ji Logo" className="navbar__logo-img" />
-          <div className="navbar__brand-text">
-            <span className="navbar__brand-name">Shri Guru Ji</span>
-            <span className="navbar__brand-tag">Dry Fruits</span>
-          </div>
+          <img src="/images/logo-mark.png" alt="Shri Guru Ji Dry Fruits" className="navbar__logo-img" />
         </Link>
 
         <div className={`navbar__links ${isMobileOpen ? 'navbar__links--open' : ''}`}>

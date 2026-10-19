@@ -2,15 +2,16 @@ import { Link } from 'react-router-dom'
 import { FiTrash2, FiMinus, FiPlus, FiShoppingBag, FiArrowRight } from 'react-icons/fi'
 import { useCart } from '../../context/CartContext'
 import { formatPrice } from '../../utils/payment'
+import { BRAND, deliveryFor } from '../../data/brand'
 import './Cart.css'
 
-const FREE_DELIVERY_THRESHOLD = 500
+const FREE_DELIVERY_THRESHOLD = BRAND.delivery.freeAbove
 
 export default function Cart() {
   const { cart, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart()
 
   const subtotal = getCartTotal()
-  const deliveryCharge = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : 50
+  const deliveryCharge = deliveryFor(subtotal)
   const total = subtotal + deliveryCharge
   const remaining = FREE_DELIVERY_THRESHOLD - subtotal
   const progressPercent = Math.min((subtotal / FREE_DELIVERY_THRESHOLD) * 100, 100)
@@ -20,9 +21,8 @@ export default function Cart() {
       <div className="cart-page">
         <div className="container">
           <div className="cart-empty">
-            <span className="cart-empty__icon">🛒</span>
-            <h2>Your Cart is Empty</h2>
-            <p>Looks like you haven't added any items yet. Explore our premium dry fruits collection!</p>
+            <h2>Your cart is empty</h2>
+            <p>Pick a few goods and they'll wait for you here.</p>
             <Link to="/products" className="btn btn-primary btn-lg">
               <FiShoppingBag size={18} /> Start Shopping
             </Link>
@@ -43,7 +43,7 @@ export default function Cart() {
           {deliveryCharge > 0 ? (
             <>
               <p className="cart-delivery-bar__msg">
-                Add <strong>{formatPrice(remaining)}</strong> more for <strong>FREE delivery!</strong>
+                Add <strong>{formatPrice(remaining)}</strong> more for free delivery.
               </p>
               <div className="cart-delivery-bar__track">
                 <div
@@ -54,7 +54,7 @@ export default function Cart() {
             </>
           ) : (
             <p className="cart-delivery-bar__msg cart-delivery-bar__msg--free">
-              🎉 You've unlocked FREE delivery!
+              Delivery is free on this order.
             </p>
           )}
         </div>
@@ -139,7 +139,7 @@ export default function Cart() {
                 </span>
               </div>
               {deliveryCharge > 0 && (
-                <p className="cart-summary__note">Free delivery on orders above ₹500</p>
+                <p className="cart-summary__note">Free delivery on orders above {formatPrice(FREE_DELIVERY_THRESHOLD)}</p>
               )}
               <div className="cart-summary__divider"></div>
               <div className="cart-summary__row cart-summary__row--total">

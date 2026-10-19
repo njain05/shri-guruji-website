@@ -17,7 +17,9 @@ export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
-  const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'All')
+  // Read from the URL every render. Copying it into state once on mount meant
+  // footer links and back/forward changed the address but never the filter.
+  const activeCategory = searchParams.get('category') || 'All'
   const [sortBy, setSortBy] = useState('name')
 
   // Debounce search — wait 250ms after user stops typing
@@ -58,7 +60,6 @@ export default function Products() {
   }, [products, activeCategory, debouncedSearch, sortBy])
 
   function handleCategoryChange(cat) {
-    setActiveCategory(cat)
     if (cat === 'All') {
       setSearchParams({})
     } else {
@@ -131,9 +132,8 @@ export default function Products() {
           </div>
         ) : filteredProducts.length === 0 ? (
           <div className="products-page__empty">
-            <span className="products-page__empty-icon">🔍</span>
-            <h3>No products found</h3>
-            <p>Try adjusting your search or category filter</p>
+            <h3>Nothing matches that</h3>
+            <p>Try a different word, or choose All to see everything we stock.</p>
           </div>
         ) : (
           <>

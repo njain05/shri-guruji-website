@@ -19,9 +19,8 @@ export default function Wishlist() {
       <div className="wishlist-page">
         <div className="container">
           <div className="wishlist-empty">
-            <span className="wishlist-empty__icon">🤍</span>
-            <h2>Your wishlist is empty</h2>
-            <p>Save products you love by tapping the heart icon on any product.</p>
+            <h2>Nothing saved yet</h2>
+            <p>Tap the heart on any product to keep it here for later.</p>
             <Link to="/products" className="btn btn-primary btn-lg">
               Browse Products <FiArrowRight size={18} />
             </Link>

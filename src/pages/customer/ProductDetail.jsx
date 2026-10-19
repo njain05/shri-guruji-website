@@ -28,7 +28,7 @@ function addToRecentlyViewed(id) {
 export default function ProductDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { getProduct, products } = useProducts()
+  const { getProduct, products, loading } = useProducts()
   const { addToCart } = useCart()
   const { toggleWishlist, isInWishlist } = useWishlist()
   const [quantity, setQuantity] = useState(1)
@@ -47,6 +47,18 @@ export default function ProductDetail() {
   useEffect(() => {
     if (product) addToRecentlyViewed(id)
   }, [id, product])
+
+  // Products arrive asynchronously; without this the page showed "not found"
+  // for a moment on every direct visit or refresh.
+  if (loading) {
+    return (
+      <div className="product-detail-page">
+        <div className="container" style={{ textAlign: 'center', paddingTop: '200px' }}>
+          <p>Loading…</p>
+        </div>
+      </div>
+    )
+  }
 
   if (!product) {
     return (
@@ -71,12 +83,16 @@ export default function ProductDetail() {
     .filter(Boolean)
     .slice(0, 4)
 
+  const available = product.inStock !== false
+
   function handleAddToCart() {
+    if (!available) return
     addToCart(product, quantity, product.weights[weightIndex])
     toast.success(`${quantity}× ${product.name} (${product.weights[weightIndex].size}) added to cart!`)
   }
 
   function handleBuyNow() {
+    if (!available) return
     addToCart(product, quantity, product.weights[weightIndex])
     navigate('/checkout')
   }
@@ -112,9 +128,12 @@ export default function ProductDetail() {
             {product.images.length > 1 && (
               <div className="product-detail__gallery" style={{ display: 'flex', gap: '10px' }}>
                 {product.images.map((img, idx) => (
-                  <div
+                  <button
+                    type="button"
                     key={idx}
                     onClick={() => setImageIndex(idx)}
+                    aria-label={`Show photo ${idx + 1} of ${product.images.length}`}
+                    aria-pressed={imageIndex === idx}
                     style={{
                       cursor: 'pointer',
                       border: imageIndex === idx ? '2px solid #C49A45' : '2px solid transparent',
@@ -122,11 +141,13 @@ export default function ProductDetail() {
                       overflow: 'hidden',
                       width: '60px',
                       height: '60px',
-                      flexShrink: 0
+                      flexShrink: 0,
+                      padding: 0,
+                      background: 'none'
                     }}
                   >
-                    <img src={img} alt={`${product.name} view ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  </div>
+                    <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </button>
                 ))}
               </div>
             )}
@@ -202,10 +223,10 @@ export default function ProductDetail() {
                 </button>
               </div>
 
-              <button className="btn btn-primary btn-lg" onClick={handleAddToCart} id="add-to-cart-btn">
+              <button className="btn btn-primary btn-lg" onClick={handleAddToCart} id="add-to-cart-btn" disabled={!available}>
                 <FiShoppingCart size={18} /> Add to Cart
               </button>
-              <button className="btn btn-gold btn-lg" onClick={handleBuyNow}>
+              <button className="btn btn-gold btn-lg" onClick={handleBuyNow} disabled={!available}>
                 Buy Now
               </button>
               <button
@@ -289,7 +310,7 @@ export default function ProductDetail() {
           <span className="product-sticky-bar__name">{product.name}</span>
           <span className="product-sticky-bar__price">{formatPrice(product.weights[weightIndex].price)}</span>
         </div>
-        <button className="btn btn-primary" onClick={handleAddToCart}>
+        <button className="btn btn-primary" onClick={handleAddToCart} disabled={!available}>
           <FiShoppingCart size={16} /> Add to Cart
         </button>
       </div>

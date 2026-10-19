@@ -168,3 +168,17 @@
     text-align: center;
   }
 }
+
+/* The logo is brown on a light ground, as on the packaging, so it sits on a
+   small cream label rather than straight on the dark footer. */
+.footer__logo-badge {
+  display: inline-block;
+  background: var(--color-cream);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+}
+.footer__logo-badge img {
+  height: 56px;
+  width: auto;
+  display: block;
+}

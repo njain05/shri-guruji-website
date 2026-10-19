@@ -163,8 +163,6 @@
 
 .product-card__category {
   font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
   color: var(--color-gold-dark);
   font-weight: 600;
 }
@@ -188,4 +186,9 @@
   font-size: 1.15rem;
   font-weight: 700;
   color: var(--color-brown);
+}
+
+.product-card__cart-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }

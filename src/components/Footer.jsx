@@ -16,15 +16,12 @@ export default function Footer() {
           <div className="footer__grid">
             <div className="footer__brand">
               <div className="footer__logo">
-                <img src="/images/logo.jpeg" alt="Shri Guru Ji Logo" className="footer__logo-img" />
-                <div>
-                  <h3 className="footer__brand-name">Shri Guru Ji</h3>
-                  <span className="footer__brand-tag">Dry Fruits</span>
-                </div>
+                <span className="footer__logo-badge">
+                  <img src="/images/logo-mark.png" alt="Shri Guru Ji Dry Fruits" />
+                </span>
               </div>
               <p className="footer__desc">
-                Premium quality dry fruits sourced directly from the finest farms.
-                We deliver freshness and nutrition right to your doorstep.
+                Dry fruits from a Ludhiana wholesale family, packed at home and sent to you.
               </p>
             </div>
 
@@ -66,7 +63,8 @@ export default function Footer() {
           </div>
 
           <div className="footer__bottom">
-            <p>© {new Date().getFullYear()} Shri Guru Ji Dry Fruits. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} Shri Guruji Traders</p>
+            <p>FSSAI licence 12124999000222</p>
             <p className="footer__tagline">Made with ❤️ by Nishtha Jain</p>
           </div>
         </div>

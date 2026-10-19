@@ -1,11 +1,12 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
-import { FiCreditCard, FiTruck, FiSmartphone, FiGift, FiShield, FiCheckCircle, FiRefreshCw, FiMessageCircle } from 'react-icons/fi'
+import { FiCreditCard, FiTruck, FiSmartphone, FiGift, FiShield, FiCheckCircle, FiMessageCircle } from 'react-icons/fi'
 import { useCart } from '../../context/CartContext'
 import { useOrders } from '../../context/OrderContext'
 import { formatPrice, generateUPILink, MERCHANT_UPI_ID, UPI_CONFIGURED, generateOrderId } from '../../utils/payment'
 import toast from 'react-hot-toast'
+import { BRAND, deliveryFor } from '../../data/brand'
 import './Checkout.css'
 
 const INDIAN_STATES = [
@@ -41,7 +42,7 @@ export default function Checkout() {
   }, [cart.length, navigate])
 
   const subtotal = getCartTotal()
-  const deliveryCharge = subtotal >= 500 ? 0 : 50
+  const deliveryCharge = deliveryFor(subtotal)
   const giftCharge = giftPackaging ? 50 : 0
   const total = subtotal + deliveryCharge + giftCharge
 
@@ -273,7 +274,7 @@ export default function Checkout() {
                 />
                 <div className="gift-option__content">
                   <span className="gift-option__label">
-                    🎁 Add gift packaging
+                    Add gift packaging
                     <span className="gift-option__price">+₹50</span>
                   </span>
                   <span className="gift-option__desc">Premium box with ribbon — perfect for festivals & celebrations</span>
@@ -367,7 +368,7 @@ export default function Checkout() {
               </div>
               {giftPackaging && (
                 <div className="checkout-summary__row">
-                  <span>🎁 Gift Packaging</span>
+                  <span>Gift packaging</span>
                   <span>{formatPrice(50)}</span>
                 </div>
               )}
@@ -380,10 +381,9 @@ export default function Checkout() {
 
             {/* Trust badges */}
             <div className="checkout-trust">
-              <div className="checkout-trust__item"><FiShield size={14} /> Secure Payment</div>
-              <div className="checkout-trust__item"><FiCheckCircle size={14} /> 100% Natural</div>
-              <div className="checkout-trust__item"><FiRefreshCw size={14} /> Easy Returns</div>
-              <div className="checkout-trust__item"><FiMessageCircle size={14} /> WhatsApp Support</div>
+              <div className="checkout-trust__item"><FiShield size={14} /> FSSAI {BRAND.fssai}</div>
+              <div className="checkout-trust__item"><FiCheckCircle size={14} /> Packed at home in {BRAND.city}</div>
+              <div className="checkout-trust__item"><FiMessageCircle size={14} /> Confirmed on WhatsApp</div>
             </div>
 
             {!showUPIQR ? (

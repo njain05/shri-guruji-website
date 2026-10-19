@@ -29,6 +29,7 @@ export default function ProductCard({ product }) {
   function handleCartClick(e) {
     e.preventDefault()
     e.stopPropagation()
+    if (product.inStock === false) return
     if (product.weights.length === 1) {
       addToCart(product, 1, product.weights[0])
       toast.success(`${product.name} (${product.weights[0].size}) added!`)
@@ -64,8 +65,8 @@ export default function ProductCard({ product }) {
             e.target.onerror = null; e.target.src = '/images/placeholder.svg'
           }}
         />
-        {product.featured && (
-          <span className="product-card__badge badge badge-gold">Premium</span>
+        {product.inStock === false && (
+          <span className="product-card__badge badge">Out of stock</span>
         )}
 
         {/* Wishlist button */}
@@ -94,7 +95,13 @@ export default function ProductCard({ product }) {
               ))}
             </div>
           )}
-          <button className="product-card__cart-btn" onClick={handleCartClick} title="Add to Cart">
+          <button
+            className="product-card__cart-btn"
+            onClick={handleCartClick}
+            disabled={product.inStock === false}
+            aria-label={`Add ${product.name} to cart`}
+            title="Add to cart"
+          >
             <FiShoppingCart size={18} />
           </button>
         </div>
@@ -104,7 +111,7 @@ export default function ProductCard({ product }) {
         <span className="product-card__category">{product.category}</span>
         <h3 className="product-card__name">{product.name}</h3>
         <div className="product-card__bottom">
-          <span className="product-card__price">From {formatPrice(product.weights[0].price)}</span>
+          <span className="product-card__price">From {formatPrice(Math.min(...product.weights.map(w => w.price)))}</span>
         </div>
       </div>
     </Link>
